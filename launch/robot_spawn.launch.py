@@ -88,7 +88,7 @@ def generate_launch_description():
 
     # Spawn robot slightly clsoer to the floor to reduce the drop
     # Ensures robot remains properly docked after the drop
-    z_robot = OffsetParser(z, 0.05)
+    z_robot = OffsetParser(z, 0.15)
 
     spawn_robot_group_action = GroupAction([
         PushRosNamespace(namespace),
@@ -119,7 +119,7 @@ def generate_launch_description():
             PythonLaunchDescriptionSource([ros_gz_bridge_launch]),
             launch_arguments=[
               ('use_sim_time', use_sim_time),
-              ('robot_name', 'robot'),
+              ('robot_name', robot_name),
               ('namespace', namespace)
             ]
         ),
