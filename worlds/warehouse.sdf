@@ -16,6 +16,15 @@
       <grid>false</grid>
     </scene>
 
+    <spherical_coordinates>
+      <surface_model>EARTH_WGS84</surface_model>
+      <world_frame_orientation>ENU</world_frame_orientation>
+      <latitude_deg>-22.986687</latitude_deg>
+      <longitude_deg>-43.202501</longitude_deg>
+      <elevation>0</elevation>
+      <heading_deg>0</heading_deg>
+    </spherical_coordinates>
+
     <!-- TODO(rkreinin): Fix lighting so that spawning multiple robots does not crash the sim-->
     <!-- <light type="directional" name="sun">
       <cast_shadows>0</cast_shadows>
