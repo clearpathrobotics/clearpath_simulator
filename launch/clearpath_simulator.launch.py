@@ -26,7 +26,7 @@ from launch.substitutions import LaunchConfiguration, PathJoinSubstitution
 ARGUMENTS = [
     DeclareLaunchArgument('namespace', default_value='',
                           description='Robot namespace'),
-    DeclareLaunchArgument('rviz', default_value='false',
+    DeclareLaunchArgument('rviz', default_value='true',
                           choices=['true', 'false'], description='Start rviz.'),
     DeclareLaunchArgument('world', default_value='warehouse',
                           description='Gazebo World'),
@@ -35,9 +35,12 @@ ARGUMENTS = [
                           description='Turtlebot4 Model'),
 ]
 
-for pose_element in ['x', 'y', 'z', 'yaw']:
+for pose_element in ['x', 'y', 'yaw']:
     ARGUMENTS.append(DeclareLaunchArgument(pose_element, default_value='0.0',
                      description=f'{pose_element} component of the robot pose.'))
+
+ARGUMENTS.append(DeclareLaunchArgument('z', default_value='0.15',
+                 description='z component of the robot pose.'))
 
 
 def generate_launch_description():
