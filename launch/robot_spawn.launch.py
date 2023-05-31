@@ -165,7 +165,7 @@ def generate_launch_description():
         executable='generate_description',
         name='generate_description',
         output='screen',
-        arguments=['-c', [setup_path, 'robot.yaml'], '-o', setup_path]
+        arguments=['-p', setup_path, '-s', 'true']
     )
 
     node_launch_generator = Node(
@@ -173,7 +173,7 @@ def generate_launch_description():
         executable='generate_launch',
         name='generate_launch',
         output='screen',
-        arguments=['-c', [setup_path, 'robot.yaml'], '-o', setup_path, '-s', 'true']
+        arguments=['-p', setup_path, '-s', 'true']
     )
 
     event_generate_description = RegisterEventHandler(
