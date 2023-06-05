@@ -40,8 +40,8 @@ ARGUMENTS = [
 def generate_launch_description():
 
     # Directories
-    pkg_clearpath_simulator = get_package_share_directory(
-        'clearpath_simulator')
+    pkg_clearpath_gz = get_package_share_directory(
+        'clearpath_gz')
     pkg_clearpath_platform_description = get_package_share_directory(
         'clearpath_platform_description')
     pkg_clearpath_sensors_description = get_package_share_directory(
@@ -59,7 +59,7 @@ def generate_launch_description():
     gz_sim_resource_path = SetEnvironmentVariable(
         name='IGN_GAZEBO_RESOURCE_PATH',
         value=[
-            os.path.join(pkg_clearpath_simulator, 'worlds'), ':' +
+            os.path.join(pkg_clearpath_gz, 'worlds'), ':' +
             str(Path(pkg_clearpath_platform_description).parent.resolve()), ':' +
             str(Path(pkg_clearpath_sensors_description).parent.resolve()), ':' +
             str(Path(pkg_clearpath_mounts_description).parent.resolve()), ':' +
@@ -71,7 +71,7 @@ def generate_launch_description():
         [pkg_ros_gz_sim, 'launch', 'gz_sim.launch.py'])
 
     gui_config = PathJoinSubstitution(
-        [pkg_clearpath_simulator, 'config', 'gui.config'])
+        [pkg_clearpath_gz, 'config', 'gui.config'])
 
     # Gazebo Simulator
     gz_sim = IncludeLaunchDescription(

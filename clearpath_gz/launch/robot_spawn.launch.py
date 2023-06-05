@@ -96,7 +96,7 @@ class GetNamespacedName(Substitution):
 def generate_launch_description():
 
     # Directories
-    pkg_clearpath_simulator = FindPackageShare('clearpath_simulator')
+    pkg_clearpath_gz = FindPackageShare('clearpath_gz')
     pkg_clearpath_viz = FindPackageShare('clearpath_viz')
 
     launch_arg_setup_path = DeclareLaunchArgument(
@@ -115,15 +115,15 @@ def generate_launch_description():
 
     # Paths
     rviz_launch = PathJoinSubstitution(
-        [pkg_clearpath_viz, 'launch', 'view_model.launch.py'])
+        [pkg_clearpath_viz, 'launch', 'view_robot.launch.py'])
     ros_gz_bridge_launch = PathJoinSubstitution(
-        [pkg_clearpath_simulator, 'launch', 'ros_gz_bridge.launch.py'])
+        [pkg_clearpath_gz, 'launch', 'ros_gz_bridge.launch.py'])
     launch_file_platform_service = PathJoinSubstitution([
         setup_path, 'platform/launch', 'platform-service.launch.py'])
     launch_file_sensors_service = PathJoinSubstitution([
         setup_path, 'sensors/launch', 'sensors-service.launch.py'])
 
-    spawn_robot_group_action = GroupAction([
+    group_action_spawn_robot = GroupAction([
         PushRosNamespace(namespace),
 
         IncludeLaunchDescription(
@@ -160,33 +160,48 @@ def generate_launch_description():
         ),
     ])
 
-    node_description_generator = Node(
-        package='clearpath_generators',
+    node_generate_description = Node(
+        package='clearpath_generator_common',
         executable='generate_description',
         name='generate_description',
         output='screen',
-        arguments=['-p', setup_path, '-s', 'true']
+        arguments=['-s', setup_path]
     )
 
-    node_launch_generator = Node(
-        package='clearpath_generators',
+    node_generate_launch = Node(
+        package='clearpath_generator_gz',
         executable='generate_launch',
         name='generate_launch',
         output='screen',
-        arguments=['-p', setup_path, '-s', 'true']
+        arguments=['-s', setup_path]
+    )
+
+    node_generate_param = Node(
+        package='clearpath_generator_gz',
+        executable='generate_param',
+        name='generate_launch',
+        output='screen',
+        arguments=['-s', setup_path]
     )
 
     event_generate_description = RegisterEventHandler(
         event_handler=OnProcessExit(
-            target_action=node_description_generator,
-            on_exit=[node_launch_generator]
+            target_action=node_generate_description,
+            on_exit=[node_generate_launch]
         )
     )
 
     event_generate_launch = RegisterEventHandler(
         event_handler=OnProcessExit(
-            target_action=node_launch_generator,
-            on_exit=[spawn_robot_group_action]
+            target_action=node_generate_launch,
+            on_exit=[node_generate_param]
+        )
+    )
+
+    event_generate_param = RegisterEventHandler(
+        event_handler=OnProcessExit(
+            target_action=node_generate_param,
+            on_exit=[group_action_spawn_robot]
         )
     )
 
@@ -202,8 +217,9 @@ def generate_launch_description():
     # Define LaunchDescription variable
     ld = LaunchDescription(ARGUMENTS)
     ld.add_action(launch_arg_setup_path)
-    ld.add_action(node_description_generator)
+    ld.add_action(node_generate_description)
     ld.add_action(event_generate_description)
     ld.add_action(event_generate_launch)
+    ld.add_action(event_generate_param)
     ld.add_action(rviz)
     return ld

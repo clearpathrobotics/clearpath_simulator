@@ -42,14 +42,14 @@ ARGUMENTS.append(DeclareLaunchArgument('z', default_value='0.15',
 
 def generate_launch_description():
     # Directories
-    pkg_clearpath_simulator = get_package_share_directory(
-        'clearpath_simulator')
+    pkg_clearpath_gz = get_package_share_directory(
+        'clearpath_gz')
 
     # Paths
     gz_sim_launch = PathJoinSubstitution(
-        [pkg_clearpath_simulator, 'launch', 'gz_sim.launch.py'])
+        [pkg_clearpath_gz, 'launch', 'gz_sim.launch.py'])
     robot_spawn_launch = PathJoinSubstitution(
-        [pkg_clearpath_simulator, 'launch', 'robot_spawn.launch.py'])
+        [pkg_clearpath_gz, 'launch', 'robot_spawn.launch.py'])
 
     gz_sim = IncludeLaunchDescription(
         PythonLaunchDescriptionSource([gz_sim_launch]),
