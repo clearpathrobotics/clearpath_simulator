@@ -36,5 +36,5 @@ Copy your `robot.yaml` into `~/clearpath`
 ## Launch
 
 ```
-ros2 launch clearpath_simulator clearpath_simulator.launch.py
+ros2 launch clearpath_gz clearpath_gz.launch.py
 ```

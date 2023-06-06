@@ -20,16 +20,20 @@ from launch import LaunchDescription
 from launch.actions import DeclareLaunchArgument
 from launch.actions import IncludeLaunchDescription
 from launch.launch_description_sources import PythonLaunchDescriptionSource
-from launch.substitutions import LaunchConfiguration, PathJoinSubstitution
+from launch.substitutions import EnvironmentVariable, LaunchConfiguration, PathJoinSubstitution
 
 
 ARGUMENTS = [
-    DeclareLaunchArgument('namespace', default_value='',
-                          description='Robot namespace'),
     DeclareLaunchArgument('rviz', default_value='false',
                           choices=['true', 'false'], description='Start rviz.'),
     DeclareLaunchArgument('world', default_value='warehouse',
                           description='Gazebo World'),
+    DeclareLaunchArgument('setup_path',
+                          default_value=[EnvironmentVariable('HOME'), '/clearpath/'],
+                          description='Clearpath setup path'),
+    DeclareLaunchArgument('use_sim_time', default_value='true',
+                          choices=['true', 'false'],
+                          description='use_sim_time'),
 ]
 
 for pose_element in ['x', 'y', 'yaw']:
@@ -61,7 +65,9 @@ def generate_launch_description():
     robot_spawn = IncludeLaunchDescription(
         PythonLaunchDescriptionSource([robot_spawn_launch]),
         launch_arguments=[
-            ('namespace', LaunchConfiguration('namespace')),
+            ('use_sim_time', LaunchConfiguration('use_sim_time')),
+            ('setup_path', LaunchConfiguration('setup_path')),
+            ('world', LaunchConfiguration('world')),
             ('rviz', LaunchConfiguration('rviz')),
             ('x', LaunchConfiguration('x')),
             ('y', LaunchConfiguration('y')),

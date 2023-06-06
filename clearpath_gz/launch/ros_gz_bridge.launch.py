@@ -28,6 +28,7 @@ def generate_launch_description():
         package='ros_gz_bridge',
         executable='parameter_bridge',
         name='cmd_vel_bridge',
+        namespace=namespace,
         output='screen',
         parameters=[{
             'use_sim_time': use_sim_time
@@ -50,6 +51,7 @@ def generate_launch_description():
         package='ros_gz_bridge',
         executable='parameter_bridge',
         name='odom_base_tf_bridge',
+        namespace=namespace,
         output='screen',
         parameters=[{
             'use_sim_time': use_sim_time

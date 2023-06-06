@@ -62,6 +62,7 @@ class GzLaunchGenerator(LaunchGenerator):
             if sensor.get_launch_enabled():
                 sensor_launch = SensorLaunch(
                         sensor,
+                        self.namespace,
                         self.sensors_launch_path,
                         self.sensors_params_path)
                 sensor_writer = LaunchWriter(sensor_launch.get_launch_file())
@@ -95,6 +96,7 @@ class GzLaunchGenerator(LaunchGenerator):
                 name='imu_0_gz_bridge',
                 package='ros_gz_bridge',
                 executable='parameter_bridge',
+                namespace=self.namespace,
                 parameters=[{'use_sim_time': True}],
                 arguments=[[
                   'prefix',
@@ -114,10 +116,12 @@ class GzLaunchGenerator(LaunchGenerator):
                   name='imu_0_static_tf',
                   package='tf2_ros',
                   executable='static_transform_publisher',
+                  namespace=self.namespace,
                   parameters=[{'use_sim_time': True}],
                   arguments=[
                       '0', '0', '0', '0', '0', '0.0',
-                      'imu_link', '/robot/base_link/imu_link'
+                      'imu_link',
+                      self.namespace + '/robot/base_link/imu_link'
                   ],
                   remappings=[
                       ('\'/tf\'', '\'tf\''),
@@ -130,6 +134,7 @@ class GzLaunchGenerator(LaunchGenerator):
                 name='gps_0_gz_bridge',
                 package='ros_gz_bridge',
                 executable='parameter_bridge',
+                namespace=self.namespace,
                 parameters=[{'use_sim_time': True}],
                 arguments=[[
                   'prefix',
@@ -149,10 +154,12 @@ class GzLaunchGenerator(LaunchGenerator):
                   name='gps_0_static_tf',
                   package='tf2_ros',
                   executable='static_transform_publisher',
+                  namespace=self.namespace,
                   parameters=[{'use_sim_time': True}],
                   arguments=[
                       '0', '0', '0', '0', '0', '0.0',
-                      'navsat_link', '/robot/base_link/navsat_link'
+                      'navsat_link',
+                      self.namespace + '/robot/base_link/navsat_link'
                   ],
                   remappings=[
                       ('\'/tf\'', '\'tf\''),
@@ -171,13 +178,50 @@ class GzLaunchGenerator(LaunchGenerator):
                 package='imu_filter_madgwick',
                 executable='imu_filter_madgwick_node',
                 name='imu_filter_node',
+                namespace=self.namespace,
                 parameters=['imu_filter'],
                 remappings=[
                   ('\'imu/data_raw\'', '\'platform/sensors/imu_0/data_raw\''),
                   ('\'imu/mag\'', '\'platform/sensors/imu_0/magnetic_field\''),
-                  ('\'imu/data\'', '\'platform/sensors/imu_0/data\'')
+                  ('\'imu/data\'', '\'platform/sensors/imu_0/data\''),
+                  ('\'/tf\'', '\'tf\''),
                 ],
             )
             platform_service_launch_writer.add_node(imu_filter_node)
+
+        # Static transform from <namespace>/odom to odom
+        # See https://github.com/ros-controls/ros2_controllers/pull/533
+        tf_namespaced_odom_publisher = LaunchFile.Node(
+            package='tf2_ros',
+            executable='static_transform_publisher',
+            name='tf_namespaced_odom_publisher',
+            namespace=self.namespace,
+            arguments=['0', '0', '0',
+                       '0', '0', '0',
+                       'odom', self.namespace + '/odom'],
+            remappings=[
+                ('\'/tf\'', '\'tf\''),
+                ('\'/tf_static\'', '\'tf_static\''),
+            ],
+        )
+
+        # Static transform from <namespace>/base_link to base_link
+        tf_namespaced_base_link_publisher = LaunchFile.Node(
+            package='tf2_ros',
+            executable='static_transform_publisher',
+            name='tf_namespaced_base_link_publisher',
+            namespace=self.namespace,
+            arguments=['0', '0', '0',
+                       '0', '0', '0',
+                       self.namespace + '/base_link', 'base_link'],
+            remappings=[
+                ('\'/tf\'', '\'tf\''),
+                ('\'/tf_static\'', '\'tf_static\''),
+            ],
+        )
+
+        if self.namespace:
+            platform_service_launch_writer.add_node(tf_namespaced_odom_publisher)
+            platform_service_launch_writer.add_node(tf_namespaced_base_link_publisher)
 
         platform_service_launch_writer.generate_file()
