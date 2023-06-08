@@ -79,10 +79,10 @@ def launch_setup(context, *args, **kwargs):
     clearpath_config = ClearpathConfigParser(config)
 
     namespace = clearpath_config.system.get_namespace()
-    if namespace:
-        robot_name = namespace + '/robot'
-    else:
+    if namespace in ('', '/'):
         robot_name = 'robot'
+    else:
+        robot_name = namespace + '/robot'
 
     # Directories
     pkg_clearpath_gz = FindPackageShare('clearpath_gz')
@@ -91,8 +91,6 @@ def launch_setup(context, *args, **kwargs):
     # Paths
     rviz_launch = PathJoinSubstitution(
         [pkg_clearpath_viz, 'launch', 'view_robot.launch.py'])
-    ros_gz_bridge_launch = PathJoinSubstitution(
-        [pkg_clearpath_gz, 'launch', 'ros_gz_bridge.launch.py'])
     launch_file_platform_service = PathJoinSubstitution([
         setup_path, 'platform/launch', 'platform-service.launch.py'])
     launch_file_sensors_service = PathJoinSubstitution([
@@ -124,16 +122,6 @@ def launch_setup(context, *args, **kwargs):
                        '-Y', yaw,
                        '-topic', 'robot_description'],
             output='screen'
-        ),
-
-        # ros_gz_bridge
-        IncludeLaunchDescription(
-            PythonLaunchDescriptionSource([ros_gz_bridge_launch]),
-            launch_arguments=[
-              ('use_sim_time', use_sim_time),
-              ('robot_name', robot_name),
-              ('namespace', namespace)
-            ]
         ),
     ])
 

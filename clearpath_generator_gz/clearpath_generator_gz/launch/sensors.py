@@ -65,25 +65,23 @@ class SensorLaunch():
             self.namespace = namespace
             self.parameters = ParamFile(self.get_name(), path=param_path)
 
+            if self.namespace in ('', '/'):
+                self.robot_name = 'robot'
+            else:
+                self.robot_name = self.namespace + '/robot'
+
             # Generated
             self.sensor_launch_file = LaunchFile(
                 self.get_name(),
                 path=launch_path)
 
-            self.static_tf_node = LaunchFile.Node(
-                name=sensor.get_name() + '_static_tf',
-                package='tf2_ros',
-                executable='static_transform_publisher',
+            self.static_tf_node = LaunchFile.get_static_tf_node(
+                name=sensor.get_name(),
                 namespace=self.namespace,
-                parameters=[{'use_sim_time': True}],
-                arguments=[
-                    '0', '0', '0', '0', '0', '0.0',
-                    sensor.get_name() + '_link', self.namespace + '/robot/base_link/' + sensor.get_name()
-                ],
-                remappings=[
-                    ('\'/tf\'', '\'tf\''),
-                    ('\'/tf_static\'', '\'tf_static\''),
-                ])
+                parent_link=sensor.get_name() + '_link',
+                child_link=self.robot_name + '/base_link/' + sensor.get_name(),
+                use_sim_time=True
+            )
 
             self.gz_bridge_node = LaunchFile.Node(
                 name=sensor.get_name() + '_gz_bridge',
@@ -113,18 +111,17 @@ class SensorLaunch():
 
         def get_gz_bridge_arg(self, suffix: str, gz_to_ros: str) -> list:
             return [
-              'prefix',
-              '\'' + self.sensor.get_name() + '/' + suffix +
-              gz_to_ros + '\''
+              LaunchFile.Variable('prefix'),
+              self.sensor.get_name() + '/' + suffix + gz_to_ros
             ]
 
         def get_gz_bridge_remap(self, suffix: str, topic: str) -> tuple:
             return (
               [
-                'prefix',
-                '\'' + self.sensor.get_name() + '/' + suffix + '\''
+                LaunchFile.Variable('prefix'),
+                self.sensor.get_name() + '/' + suffix
               ],
-              '\'' + topic + '\''
+              topic
             )
 
     class Lidar2dLaunch(BaseLaunch):
