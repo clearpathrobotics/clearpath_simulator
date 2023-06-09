@@ -16,12 +16,7 @@
 
 from clearpath_config.parser import ClearpathConfigParser
 
-from launch import (
-    LaunchContext,
-    LaunchDescription,
-    SomeSubstitutionsType,
-    Substitution
-)
+from launch import LaunchDescription
 from launch.actions import (
     DeclareLaunchArgument,
     GroupAction,
@@ -40,8 +35,6 @@ from launch.substitutions import (
 
 from launch_ros.actions import Node
 from launch_ros.substitutions import FindPackageShare
-
-from typing import Union
 
 
 ARGUMENTS = [
@@ -85,7 +78,6 @@ def launch_setup(context, *args, **kwargs):
         robot_name = namespace + '/robot'
 
     # Directories
-    pkg_clearpath_gz = FindPackageShare('clearpath_gz')
     pkg_clearpath_viz = FindPackageShare('clearpath_viz')
 
     # Paths
