@@ -170,8 +170,8 @@ class SensorLaunch():
             ]
 
             self.gz_bridge_node.remappings = [
-              self.get_gz_bridge_remap('camera_info', 'platform/sensors/' + sensor.get_name() + '/camera_info'),
-              self.get_gz_bridge_remap('image', 'platform/sensors/' + sensor.get_name() + '/image'),
+              self.get_gz_bridge_remap('camera_info', 'platform/sensors/' + sensor.get_name() + '/colour/camera_info'),
+              self.get_gz_bridge_remap('image', 'platform/sensors/' + sensor.get_name() + '/colour/image'),
             ]
 
     class IntelRealsenseLaunch(CameraLaunch):
@@ -197,7 +197,7 @@ class SensorLaunch():
                 self.gz_bridge_node.remappings.append(
                   self.get_gz_bridge_remap(
                     'depth_image',
-                    'platform/sensors/' + sensor.get_name() + '/depth_image')
+                    'platform/sensors/' + sensor.get_name() + '/depth/image')
                 )
 
     class GPSLaunch(BaseLaunch):
@@ -211,7 +211,7 @@ class SensorLaunch():
             self.gz_bridge_node.remappings = [
               self.get_gz_bridge_remap(
                 'navsat',
-                'platform/sensors/' + sensor.get_name() + '/navsat')
+                'platform/sensors/' + sensor.get_name() + '/fix')
             ]
 
     MODEL = {
