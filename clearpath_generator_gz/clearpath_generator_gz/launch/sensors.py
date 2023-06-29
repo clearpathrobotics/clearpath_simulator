@@ -170,8 +170,8 @@ class SensorLaunch():
             ]
 
             self.gz_bridge_node.remappings = [
-              self.get_gz_bridge_remap('camera_info', 'platform/sensors/' + sensor.get_name() + '/colour/camera_info'),
-              self.get_gz_bridge_remap('image', 'platform/sensors/' + sensor.get_name() + '/colour/image'),
+              self.get_gz_bridge_remap('camera_info', 'platform/sensors/' + sensor.get_name() + '/color/camera_info'),
+              self.get_gz_bridge_remap('image', 'platform/sensors/' + sensor.get_name() + '/color/image'),
             ]
 
     class IntelRealsenseLaunch(CameraLaunch):
