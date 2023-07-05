@@ -1,0 +1,16 @@
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Changelog for package clearpath_generator_gz
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Forthcoming
+-----------
+* Changed colour to color
+* Added dependencies.repos
+  Updated topic names to match API
+* Support for empty namespace
+  Generate tf and cmd_vel bridges
+* Namespacing support
+* Renamed clearpath_simulator to clearpath_gz
+  clearpath_simulator is now a metapackage
+  Added clearpath_generator_gz
+* Contributors: Roni Kreinin
