@@ -2,8 +2,8 @@
 Changelog for package clearpath_simulator
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.0.1 (2023-07-05)
+------------------
 * Renamed clearpath_simulator to clearpath_gz
   clearpath_simulator is now a metapackage
   Added clearpath_generator_gz

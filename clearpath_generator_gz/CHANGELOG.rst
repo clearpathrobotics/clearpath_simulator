@@ -2,8 +2,8 @@
 Changelog for package clearpath_generator_gz
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.0.1 (2023-07-05)
+------------------
 * Changed colour to color
 * Added dependencies.repos
   Updated topic names to match API

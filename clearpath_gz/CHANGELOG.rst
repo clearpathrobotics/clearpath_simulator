@@ -2,8 +2,8 @@
 Changelog for package clearpath_gz
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.0.1 (2023-07-05)
+------------------
 * Renamed launch file to simulation.launch.py
 * Support for empty namespace
   Generate tf and cmd_vel bridges
