@@ -32,7 +32,7 @@
 # modification, is not permitted without the express permission
 # of Clearpath Robotics.
 
-from clearpath_config.platform.platform import Platform
+from clearpath_config.common.types.platform import Platform
 
 from clearpath_generator_common.common import LaunchFile
 from clearpath_generator_common.launch.writer import LaunchWriter
