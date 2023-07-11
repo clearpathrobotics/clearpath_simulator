@@ -14,7 +14,7 @@
 #
 # @author Roni Kreinin (rkreinin@clearpathrobotics.com)
 
-from clearpath_config.parser import ClearpathConfigParser
+from clearpath_config.clearpath_config import ClearpathConfig
 
 from launch import LaunchDescription
 from launch.actions import (
@@ -66,12 +66,10 @@ def launch_setup(context, *args, **kwargs):
     x, y, z = LaunchConfiguration('x'), LaunchConfiguration('y'), LaunchConfiguration('z')
     yaw = LaunchConfiguration('yaw')
 
-    # Read robot YAML
-    config = ClearpathConfigParser.read_yaml(setup_path.perform(context) + 'robot.yaml')
     # Parse robot YAML into config
-    clearpath_config = ClearpathConfigParser(config)
+    clearpath_config = ClearpathConfig(str(setup_path.perform(context) + 'robot.yaml'))
 
-    namespace = clearpath_config.system.get_namespace()
+    namespace = clearpath_config.system.namespace
     if namespace in ('', '/'):
         robot_name = 'robot'
     else:
