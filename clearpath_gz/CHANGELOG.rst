@@ -2,6 +2,12 @@
 Changelog for package clearpath_gz
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* [clearpath_gz] Removed ros_gz from CMakeLists.txt.
+* Updated imports and getters
+* Contributors: Luis Camero, Tony Baltovski
+
 0.0.1 (2023-07-05)
 ------------------
 * Renamed launch file to simulation.launch.py
