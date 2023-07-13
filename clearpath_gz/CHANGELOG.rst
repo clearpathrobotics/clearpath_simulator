@@ -2,8 +2,8 @@
 Changelog for package clearpath_gz
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.0.2 (2023-07-13)
+------------------
 * [clearpath_gz] Removed ros_gz from CMakeLists.txt.
 * Updated imports and getters
 * Contributors: Luis Camero, Tony Baltovski
