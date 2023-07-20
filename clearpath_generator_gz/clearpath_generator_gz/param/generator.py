@@ -46,5 +46,5 @@ class GzParamGenerator(ParamGenerator):
                 param,
                 self.clearpath_config,
                 self.platform_params_path)
-            platform_param.update_parameters(extra_parameters={'use_sim_time': True})
-            platform_param.generate_config()
+            platform_param.generate_parameters(use_sim_time=True)
+            platform_param.generate_parameter_file()
