@@ -219,6 +219,7 @@ class GzLaunchGenerator(LaunchGenerator):
             Platform.A200: [
                 self.cmd_vel_node,
                 self.odom_base_node,
+                self.prefix_launch_arg,
             ],
         }
 
