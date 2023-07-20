@@ -99,7 +99,7 @@ class SensorLaunch():
 
         @property
         def namespace(self) -> str:
-            """Return sensor namespace"""
+            """Return sensor namespace."""
             if self._robot_namespace in ('', '/'):
                 return f'{self.TOPIC_NAMESPACE}{self.sensor.name}'
             else:
@@ -107,12 +107,12 @@ class SensorLaunch():
 
         @property
         def name(self) -> str:
-            """Return sensor name"""
+            """Return sensor name."""
             return self.sensor.name
 
         @property
         def robot_name(self) -> str:
-            """Return robot name"""
+            """Return robot name."""
             if self._robot_namespace in ('', '/'):
                 return 'robot'
             else:
@@ -120,7 +120,7 @@ class SensorLaunch():
 
         @property
         def model(self) -> str:
-            """Return sensor model"""
+            """Return sensor model."""
             return self.sensor.SENSOR_MODEL
 
         def get_gz_bridge_arg(self, suffix: str, gz_to_ros: str) -> list:
