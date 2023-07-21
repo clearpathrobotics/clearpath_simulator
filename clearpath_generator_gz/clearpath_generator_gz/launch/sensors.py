@@ -38,11 +38,12 @@ from clearpath_config.sensors.types.imu import BaseIMU, Microstrain
 from clearpath_config.sensors.types.gps import BaseGPS, SwiftNavDuro
 
 from clearpath_generator_common.common import LaunchFile, ParamFile
+from clearpath_generator_common.launch.writer import LaunchWriter
 
 
 class SensorLaunch():
     class BaseLaunch():
-        TOPIC_NAMESPACE = 'platform/sensors/'
+        TOPIC_NAMESPACE = 'sensors/'
 
         # Launch arguments
         PARAMETERS = 'parameters'
@@ -58,56 +59,69 @@ class SensorLaunch():
 
         def __init__(self,
                      sensor: BaseSensor,
-                     namespace: str,
+                     robot_namespace: str,
                      launch_path: str,
                      param_path: str) -> None:
             self.sensor = sensor
-            self.namespace = namespace
-            self.parameters = ParamFile(self.get_name(), path=param_path)
-
-            if self.namespace in ('', '/'):
-                self.robot_name = 'robot'
-            else:
-                self.robot_name = self.namespace + '/robot'
+            self._robot_namespace = robot_namespace
+            self.parameters = ParamFile(self.name, path=param_path)
+            self.prefix_launch_arg = LaunchFile.LaunchArg('prefix')
 
             # Generated
-            self.sensor_launch_file = LaunchFile(
-                self.get_name(),
+            self.launch_file = LaunchFile(
+                self.name,
                 path=launch_path)
 
             self.static_tf_node = LaunchFile.get_static_tf_node(
-                name=sensor.get_name(),
+                name=self.name,
                 namespace=self.namespace,
-                parent_link=sensor.get_name() + '_link',
-                child_link=self.robot_name + '/base_link/' + sensor.get_name(),
+                parent_link=self.name + '_link',
+                child_link=self.robot_name + '/base_link/' + self.name,
                 use_sim_time=True
             )
 
             self.gz_bridge_node = LaunchFile.Node(
-                name=sensor.get_name() + '_gz_bridge',
+                name=self.name + '_gz_bridge',
                 namespace=self.namespace,
                 package='ros_gz_bridge',
                 executable='parameter_bridge',
                 parameters=[{'use_sim_time': True}]
             )
 
-        def get_launch_file(self) -> LaunchFile:
-            return self.sensor_launch_file
+        def generate(self):
+            sensor_writer = LaunchWriter(self.launch_file)
+            # Add sensor bridge and tf nodes
+            sensor_writer.add(self.gz_bridge_node)
+            sensor_writer.add(self.static_tf_node)
+            sensor_writer.add(self.prefix_launch_arg)
+            # Generate sensor launch file
+            sensor_writer.generate_file()
 
-        def get_name(self) -> str:
-            return self.sensor.get_name()
+        @property
+        def namespace(self) -> str:
+            """Return sensor namespace."""
+            if self._robot_namespace in ('', '/'):
+                return f'{self.TOPIC_NAMESPACE}{self.sensor.name}'
+            else:
+                return f'{self._robot_namespace}/{self.TOPIC_NAMESPACE}{self.sensor.name}'
 
-        def get_model(self) -> str:
+        @property
+        def name(self) -> str:
+            """Return sensor name."""
+            return self.sensor.name
+
+        @property
+        def robot_name(self) -> str:
+            """Return robot name."""
+            if self._robot_namespace in ('', '/'):
+                return 'robot'
+            else:
+                return self._robot_namespace + '/robot'
+
+        @property
+        def model(self) -> str:
+            """Return sensor model."""
             return self.sensor.SENSOR_MODEL
-
-        def get_namespace(self) -> str:
-            return self.TOPIC_NAMESPACE + self.sensor.get_name()
-
-        def get_static_tf_node(self) -> LaunchFile.Node:
-            return self.static_tf_node
-
-        def get_gz_bridge_node(self) -> LaunchFile.Node:
-            return self.gz_bridge_node
 
         def get_gz_bridge_arg(self, suffix: str, gz_to_ros: str) -> list:
             return [
@@ -125,44 +139,60 @@ class SensorLaunch():
             )
 
     class Lidar2dLaunch(BaseLaunch):
-        def __init__(self, sensor: BaseLidar2D, namespace: str, launch_path: str, param_path: str) -> None:
-            super().__init__(sensor, namespace, launch_path, param_path)
+        def __init__(self,
+                     sensor: BaseLidar2D,
+                     robot_namespace: str,
+                     launch_path: str,
+                     param_path: str) -> None:
+            super().__init__(sensor, robot_namespace, launch_path, param_path)
 
             self.gz_bridge_node.arguments = [
               self.get_gz_bridge_arg('scan', self.GZ_TO_ROS_LASERSCAN)
             ]
 
             self.gz_bridge_node.remappings = [
-              self.get_gz_bridge_remap('scan', 'platform/sensors/' + sensor.get_topic())
+              self.get_gz_bridge_remap('scan', 'platform/sensors/' + sensor.topic)
             ]
 
     class Lidar3dLaunch(BaseLaunch):
-        def __init__(self, sensor: BaseLidar3D, namespace: str, launch_path: str, param_path: str) -> None:
-            super().__init__(sensor, namespace, launch_path, param_path)
+        def __init__(self,
+                     sensor: BaseLidar3D,
+                     robot_namespace: str,
+                     launch_path: str,
+                     param_path: str) -> None:
+            super().__init__(sensor, robot_namespace, launch_path, param_path)
 
             self.gz_bridge_node.arguments = [
               self.get_gz_bridge_arg('scan/points', self.GZ_TO_ROS_POINTCLOUD)
             ]
 
             self.gz_bridge_node.remappings = [
-              self.get_gz_bridge_remap('scan/points', 'platform/sensors/' + sensor.get_topic())
+              self.get_gz_bridge_remap('scan/points', 'platform/sensors/' + sensor.topic)
             ]
 
     class ImuLaunch(BaseLaunch):
-        def __init__(self, sensor: BaseIMU, namespace: str, launch_path: str, param_path: str) -> None:
-            super().__init__(sensor, namespace, launch_path, param_path)
+        def __init__(self,
+                     sensor: BaseIMU,
+                     robot_namespace: str,
+                     launch_path: str,
+                     param_path: str) -> None:
+            super().__init__(sensor, robot_namespace, launch_path, param_path)
 
             self.gz_bridge_node.arguments = [
               self.get_gz_bridge_arg('imu', self.GZ_TO_ROS_IMU)
             ]
 
             self.gz_bridge_node.remappings = [
-              self.get_gz_bridge_remap('imu', 'platform/sensors/' + sensor.get_name() + '/data')
+              self.get_gz_bridge_remap('imu', 'platform/sensors/' + sensor.name + '/data')
             ]
 
     class CameraLaunch(BaseLaunch):
-        def __init__(self, sensor: BaseCamera, namespace: str, launch_path: str, param_path: str) -> None:
-            super().__init__(sensor, namespace, launch_path, param_path)
+        def __init__(self,
+                     sensor: BaseCamera,
+                     robot_namespace: str,
+                     launch_path: str,
+                     param_path: str) -> None:
+            super().__init__(sensor, robot_namespace, launch_path, param_path)
 
             self.gz_bridge_node.arguments = [
               self.get_gz_bridge_arg('camera_info', self.GZ_TO_ROS_CAMERA_INFO),
@@ -170,12 +200,18 @@ class SensorLaunch():
             ]
 
             self.gz_bridge_node.remappings = [
-              self.get_gz_bridge_remap('camera_info', 'platform/sensors/' + sensor.get_name() + '/color/camera_info'),
-              self.get_gz_bridge_remap('image', 'platform/sensors/' + sensor.get_name() + '/color/image'),
+              self.get_gz_bridge_remap('camera_info',
+                                       'platform/sensors/' + sensor.name + '/color/camera_info'),
+              self.get_gz_bridge_remap('image',
+                                       'platform/sensors/' + sensor.name + '/color/image'),
             ]
 
     class IntelRealsenseLaunch(CameraLaunch):
-        def __init__(self, sensor: IntelRealsense, namespace: str, launch_path: str, param_path: str) -> None:
+        def __init__(self,
+                     sensor: IntelRealsense,
+                     namespace: str,
+                     launch_path: str,
+                     param_path: str) -> None:
             super().__init__(sensor, namespace, launch_path, param_path)
 
             if sensor.get_pointcloud_enabled():
@@ -201,7 +237,11 @@ class SensorLaunch():
                 )
 
     class GPSLaunch(BaseLaunch):
-        def __init__(self, sensor: BaseGPS, namespace: str, launch_path: str, param_path: str) -> None:
+        def __init__(self,
+                     sensor: BaseGPS,
+                     namespace: str,
+                     launch_path: str,
+                     param_path: str) -> None:
             super().__init__(sensor, namespace, launch_path, param_path)
 
             self.gz_bridge_node.arguments = [
@@ -223,5 +263,10 @@ class SensorLaunch():
         SwiftNavDuro.SENSOR_MODEL: GPSLaunch
     }
 
-    def __new__(cls, sensor: BaseSensor, namespace: str, launch_path: str, param_path: str) -> BaseLaunch:
-        return SensorLaunch.MODEL[sensor.SENSOR_MODEL](sensor, namespace, launch_path, param_path)
+    def __new__(cls,
+                sensor: BaseSensor,
+                robot_namespace: str,
+                launch_path: str,
+                param_path: str) -> BaseLaunch:
+        return SensorLaunch.MODEL[sensor.SENSOR_MODEL](
+            sensor, robot_namespace, launch_path, param_path)

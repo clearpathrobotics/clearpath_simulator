@@ -59,40 +59,6 @@ class GzLaunchGenerator(LaunchGenerator):
         else:
             self.robot_name = self.namespace + '/robot'
 
-    def generate_sensors(self) -> None:
-        sensors_service_launch_writer = LaunchWriter(self.sensors_service_launch_file)
-        sensors = self.clearpath_config.sensors.get_all_sensors()
-
-        prefix_launch_arg = LaunchFile.LaunchArg(
-                'prefix',
-                default_value='/world/warehouse/model/robot/link/base_link/sensor/',
-                description='Ignition sensor topic prefix'
-            )
-
-        for sensor in sensors:
-            if sensor.get_launch_enabled():
-                sensor_launch = SensorLaunch(
-                        sensor,
-                        self.namespace,
-                        self.sensors_launch_path,
-                        self.sensors_params_path)
-                sensor_writer = LaunchWriter(sensor_launch.get_launch_file())
-                # Add sensor bridge and tf nodes
-                sensor_writer.add_node(sensor_launch.get_gz_bridge_node())
-                sensor_writer.add_node(sensor_launch.get_static_tf_node())
-                sensor_writer.declare_launch_arg(prefix_launch_arg)
-                # Generate sensor launch file
-                sensor_writer.generate_file()
-                # Add sensor to top level sensors launch file
-                sensors_service_launch_writer.add_launch_file(sensor_launch.get_launch_file())
-
-        sensors_service_launch_writer.declare_launch_arg(prefix_launch_arg)
-        sensors_service_launch_writer.generate_file()
-
-    def generate_platform(self) -> None:
-        platform_service_launch_writer = LaunchWriter(self.platform_service_launch_file)
-        platform_service_launch_writer.add_launch_file(self.platform_launch_file)
-
         # cmd_vel bridge
         if self.namespace in ('', '/'):
             cmd_vel_bridge_arg = '/cmd_vel' + self.GZ_TO_ROS_TWIST
@@ -107,7 +73,7 @@ class GzLaunchGenerator(LaunchGenerator):
             'platform/cmd_vel_unstamped'
           )
 
-        cmd_vel_node = LaunchFile.Node(
+        self.cmd_vel_node = LaunchFile.Node(
             package='ros_gz_bridge',
             executable='parameter_bridge',
             name='cmd_vel_bridge',
@@ -123,7 +89,7 @@ class GzLaunchGenerator(LaunchGenerator):
             ])
 
         # odom to base_link tf bridge
-        odom_base_node = LaunchFile.Node(
+        self.odom_base_node = LaunchFile.Node(
             package='ros_gz_bridge',
             executable='parameter_bridge',
             name='odom_base_tf_bridge',
@@ -137,7 +103,7 @@ class GzLaunchGenerator(LaunchGenerator):
             ])
 
         # Prefix launch arg
-        prefix_launch_arg = LaunchFile.LaunchArg(
+        self.prefix_launch_arg = LaunchFile.LaunchArg(
             'prefix',
             default_value='/world/warehouse/model/robot/link/base_link/sensor/',
             description='Ignition sensor topic prefix'
@@ -145,7 +111,7 @@ class GzLaunchGenerator(LaunchGenerator):
         prefix_variable = LaunchFile.Variable('prefix')
 
         # Builtin IMU bridge
-        imu_0_bridge_node = LaunchFile.Node(
+        self.imu_0_bridge_node = LaunchFile.Node(
           name='imu_0_gz_bridge',
           package='ros_gz_bridge',
           executable='parameter_bridge',
@@ -162,7 +128,7 @@ class GzLaunchGenerator(LaunchGenerator):
         )
 
         # IMU static tf
-        imu_0_static_tf_node = LaunchFile.get_static_tf_node(
+        self.imu_0_static_tf_node = LaunchFile.get_static_tf_node(
           name='imu_0',
           namespace=self.namespace,
           parent_link='imu_link',
@@ -171,13 +137,13 @@ class GzLaunchGenerator(LaunchGenerator):
         )
 
         # IMU filter
-        imu_filter_arg = LaunchFile.LaunchArg(
+        self.imu_filter_arg = LaunchFile.LaunchArg(
             'imu_filter',
             default_value=os.path.join(self.platform_params_path, 'imu_filter.yaml')
         )
         imu_filter_variable = LaunchFile.Variable('imu_filter')
 
-        imu_filter_node = LaunchFile.Node(
+        self.imu_filter_node = LaunchFile.Node(
             package='imu_filter_madgwick',
             executable='imu_filter_madgwick_node',
             name='imu_filter_node',
@@ -192,7 +158,7 @@ class GzLaunchGenerator(LaunchGenerator):
         )
 
         # GPS bridge
-        gps_0_bridge_node = LaunchFile.Node(
+        self.gps_0_bridge_node = LaunchFile.Node(
           name='gps_0_gz_bridge',
           package='ros_gz_bridge',
           executable='parameter_bridge',
@@ -210,7 +176,7 @@ class GzLaunchGenerator(LaunchGenerator):
         )
 
         # GPS static tf
-        gps_0_static_tf_node = LaunchFile.get_static_tf_node(
+        self.gps_0_static_tf_node = LaunchFile.get_static_tf_node(
           name='gps_0',
           namespace=self.namespace,
           parent_link='navsat_link',
@@ -220,7 +186,7 @@ class GzLaunchGenerator(LaunchGenerator):
 
         # Static transform from <namespace>/odom to odom
         # See https://github.com/ros-controls/ros2_controllers/pull/533
-        tf_namespaced_odom_publisher = LaunchFile.get_static_tf_node(
+        self.tf_namespaced_odom_publisher = LaunchFile.get_static_tf_node(
             name='namespaced_odom',
             namespace=self.namespace,
             parent_link='odom',
@@ -229,8 +195,7 @@ class GzLaunchGenerator(LaunchGenerator):
         )
 
         # Static transform from <namespace>/base_link to base_link
-
-        tf_namespaced_base_link_publisher = LaunchFile.get_static_tf_node(
+        self.tf_namespaced_base_link_publisher = LaunchFile.get_static_tf_node(
             name='namespaced_base_link',
             namespace=self.namespace,
             parent_link=self.namespace + '/base_link',
@@ -238,22 +203,61 @@ class GzLaunchGenerator(LaunchGenerator):
             use_sim_time=True
         )
 
-        # Common Nodes
-        platform_service_launch_writer.add_node(cmd_vel_node)
-        platform_service_launch_writer.add_node(odom_base_node)
+        # Components required for each platform
+        self.platform_components = {
+            Platform.J100: [
+                self.cmd_vel_node,
+                self.odom_base_node,
+                self.prefix_launch_arg,
+                self.imu_0_bridge_node,
+                self.imu_0_static_tf_node,
+                self.imu_filter_arg,
+                self.imu_filter_node,
+                self.gps_0_bridge_node,
+                self.gps_0_static_tf_node
+            ],
+            Platform.A200: [
+                self.cmd_vel_node,
+                self.odom_base_node,
+                self.prefix_launch_arg,
+            ],
+        }
+
+    def generate_sensors(self) -> None:
+        sensors_service_launch_writer = LaunchWriter(self.sensors_service_launch_file)
+        sensors = self.clearpath_config.sensors.get_all_sensors()
+
+        prefix_launch_arg = LaunchFile.LaunchArg(
+                'prefix',
+                default_value='/world/warehouse/model/robot/link/base_link/sensor/',
+                description='Ignition sensor topic prefix'
+            )
+
+        for sensor in sensors:
+            if sensor.get_launch_enabled():
+                sensor_launch = SensorLaunch(
+                        sensor,
+                        self.namespace,
+                        self.sensors_launch_path,
+                        self.sensors_params_path)
+                sensor_launch.prefix_launch_arg = prefix_launch_arg
+                sensor_launch.generate()
+                # Add sensor to top level sensors launch file
+                sensors_service_launch_writer.add_launch_file(sensor_launch.launch_file)
+
+        sensors_service_launch_writer.add(prefix_launch_arg)
+        sensors_service_launch_writer.generate_file()
+
+    def generate_platform(self) -> None:
+        platform_service_launch_writer = LaunchWriter(self.platform_service_launch_file)
+        platform_service_launch_writer.add_launch_file(self.platform_launch_file)
+
+        # Platform components
+        for component in self.platform_components[self.platform_model]:
+            platform_service_launch_writer.add(component)
 
         if self.namespace not in ('', '/'):
-            platform_service_launch_writer.add_node(tf_namespaced_odom_publisher)
-            platform_service_launch_writer.add_node(tf_namespaced_base_link_publisher)
-
-        # J100 Nodes
-        if self.platform_model == Platform.J100:
-            platform_service_launch_writer.declare_launch_arg(prefix_launch_arg)
-            platform_service_launch_writer.declare_launch_arg(imu_filter_arg)
-            platform_service_launch_writer.add_node(imu_0_bridge_node)
-            platform_service_launch_writer.add_node(imu_0_static_tf_node)
-            platform_service_launch_writer.add_node(imu_filter_node)
-            platform_service_launch_writer.add_node(gps_0_bridge_node)
-            platform_service_launch_writer.add_node(gps_0_static_tf_node)
+            platform_service_launch_writer.add(self.tf_namespaced_odom_publisher)
+            platform_service_launch_writer.add(self.tf_namespaced_base_link_publisher)
 
         platform_service_launch_writer.generate_file()
