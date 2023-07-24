@@ -2,6 +2,14 @@
 Changelog for package clearpath_generator_gz
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Linting
+* Added prefix launch arg for A200
+* Updated param generator 'use_sim_time' implementation
+* Launch generator cleanup
+* Contributors: Roni Kreinin
+
 0.0.2 (2023-07-13)
 ------------------
 * Updated imports and getters

@@ -2,6 +2,11 @@
 Changelog for package clearpath_gz
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Linting
+* Contributors: Roni Kreinin
+
 0.0.2 (2023-07-13)
 ------------------
 * [clearpath_gz] Removed ros_gz from CMakeLists.txt.
