@@ -2,8 +2,8 @@
 Changelog for package clearpath_simulator
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.0.3 (2023-07-24)
+------------------
 * Linting
 * Contributors: Roni Kreinin
 
