@@ -69,7 +69,8 @@ def launch_setup(context, *args, **kwargs):
     yaw = LaunchConfiguration('yaw')
 
     # Parse robot YAML into config
-    clearpath_config = ClearpathConfig(os.path.join(str(setup_path.perform(context)), 'robot.yaml'))
+    clearpath_config = ClearpathConfig(os.path.join(
+        str(setup_path.perform(context)), 'robot.yaml'))
 
     namespace = clearpath_config.system.namespace
     if namespace in ('', '/'):
