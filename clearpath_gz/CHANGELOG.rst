@@ -2,6 +2,12 @@
 Changelog for package clearpath_gz
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Linter
+* Renamed UST10 to UST
+* Contributors: Roni Kreinin
+
 0.0.3 (2023-07-24)
 ------------------
 * Linting
