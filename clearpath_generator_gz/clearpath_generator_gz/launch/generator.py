@@ -123,7 +123,7 @@ class GzLaunchGenerator(LaunchGenerator):
           ]],
           remappings=[
             ([prefix_variable, 'imu_link/imu'],
-             'platform/sensors/imu_0/data_raw')
+             'sensors/imu_0/data_raw')
           ]
         )
 
@@ -150,9 +150,9 @@ class GzLaunchGenerator(LaunchGenerator):
             namespace=self.namespace,
             parameters=[imu_filter_variable],
             remappings=[
-              ('imu/data_raw', 'platform/sensors/imu_0/data_raw'),
-              ('imu/mag', 'platform/sensors/imu_0/magnetic_field'),
-              ('imu/data', 'platform/sensors/imu_0/data'),
+              ('imu/data_raw', 'sensors/imu_0/data_raw'),
+              ('imu/mag', 'sensors/imu_0/magnetic_field'),
+              ('imu/data', 'sensors/imu_0/data'),
               ('/tf', 'tf'),
             ],
         )
@@ -171,7 +171,7 @@ class GzLaunchGenerator(LaunchGenerator):
           remappings=[
             ([prefix_variable,
               'navsat_link/navsat'],
-             'platform/sensors/gps_0/navsat')
+             'sensors/gps_0/navsat')
           ]
         )
 

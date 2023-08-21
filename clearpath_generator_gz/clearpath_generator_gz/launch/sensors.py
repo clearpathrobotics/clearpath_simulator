@@ -101,9 +101,9 @@ class SensorLaunch():
         def namespace(self) -> str:
             """Return sensor namespace."""
             if self._robot_namespace in ('', '/'):
-                return f'{self.TOPIC_NAMESPACE}{self.sensor.name}'
+                return f'{self.TOPIC_NAMESPACE}'
             else:
-                return f'{self._robot_namespace}/{self.TOPIC_NAMESPACE}{self.sensor.name}'
+                return f'{self._robot_namespace}/{self.TOPIC_NAMESPACE}'
 
         @property
         def name(self) -> str:
@@ -151,7 +151,7 @@ class SensorLaunch():
             ]
 
             self.gz_bridge_node.remappings = [
-              self.get_gz_bridge_remap('scan', 'platform/sensors/' + sensor.topic)
+              self.get_gz_bridge_remap('scan', sensor.topic)
             ]
 
     class Lidar3dLaunch(BaseLaunch):
@@ -167,7 +167,7 @@ class SensorLaunch():
             ]
 
             self.gz_bridge_node.remappings = [
-              self.get_gz_bridge_remap('scan/points', 'platform/sensors/' + sensor.topic)
+              self.get_gz_bridge_remap('scan/points', sensor.topic)
             ]
 
     class ImuLaunch(BaseLaunch):
@@ -183,7 +183,7 @@ class SensorLaunch():
             ]
 
             self.gz_bridge_node.remappings = [
-              self.get_gz_bridge_remap('imu', 'platform/sensors/' + sensor.name + '/data')
+              self.get_gz_bridge_remap('imu', sensor.name + '/data')
             ]
 
     class CameraLaunch(BaseLaunch):
@@ -200,10 +200,8 @@ class SensorLaunch():
             ]
 
             self.gz_bridge_node.remappings = [
-              self.get_gz_bridge_remap('camera_info',
-                                       'platform/sensors/' + sensor.name + '/color/camera_info'),
-              self.get_gz_bridge_remap('image',
-                                       'platform/sensors/' + sensor.name + '/color/image'),
+              self.get_gz_bridge_remap('camera_info', sensor.name + '/color/camera_info'),
+              self.get_gz_bridge_remap('image', sensor.name + '/color/image'),
             ]
 
     class IntelRealsenseLaunch(CameraLaunch):
@@ -222,7 +220,7 @@ class SensorLaunch():
                 self.gz_bridge_node.remappings.append(
                   self.get_gz_bridge_remap(
                     'points',
-                    'platform/sensors/' + sensor.get_name() + '/points')
+                    sensor.get_name() + '/points')
                 )
 
             if sensor.get_depth_enabled():
@@ -233,7 +231,7 @@ class SensorLaunch():
                 self.gz_bridge_node.remappings.append(
                   self.get_gz_bridge_remap(
                     'depth_image',
-                    'platform/sensors/' + sensor.get_name() + '/depth/image')
+                    sensor.get_name() + '/depth/image')
                 )
 
     class GPSLaunch(BaseLaunch):
@@ -251,7 +249,7 @@ class SensorLaunch():
             self.gz_bridge_node.remappings = [
               self.get_gz_bridge_remap(
                 'navsat',
-                'platform/sensors/' + sensor.get_name() + '/fix')
+                sensor.get_name() + '/fix')
             ]
 
     MODEL = {
