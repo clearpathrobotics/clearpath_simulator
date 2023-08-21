@@ -127,15 +127,6 @@ class GzLaunchGenerator(LaunchGenerator):
           ]
         )
 
-        # IMU static tf
-        self.imu_0_static_tf_node = LaunchFile.get_static_tf_node(
-          name='imu_0',
-          namespace=self.namespace,
-          parent_link='imu_link',
-          child_link=self.robot_name + '/base_link/imu_link',
-          use_sim_time=True
-        )
-
         # IMU filter
         self.imu_filter_arg = LaunchFile.LaunchArg(
             'imu_filter',
@@ -175,15 +166,6 @@ class GzLaunchGenerator(LaunchGenerator):
           ]
         )
 
-        # GPS static tf
-        self.gps_0_static_tf_node = LaunchFile.get_static_tf_node(
-          name='gps_0',
-          namespace=self.namespace,
-          parent_link='navsat_link',
-          child_link=self.robot_name + '/base_link/navsat_link',
-          use_sim_time=True
-        )
-
         # Static transform from <namespace>/odom to odom
         # See https://github.com/ros-controls/ros2_controllers/pull/533
         self.tf_namespaced_odom_publisher = LaunchFile.get_static_tf_node(
@@ -210,11 +192,9 @@ class GzLaunchGenerator(LaunchGenerator):
                 self.odom_base_node,
                 self.prefix_launch_arg,
                 self.imu_0_bridge_node,
-                self.imu_0_static_tf_node,
                 self.imu_filter_arg,
                 self.imu_filter_node,
                 self.gps_0_bridge_node,
-                self.gps_0_static_tf_node
             ],
             Platform.A200: [
                 self.cmd_vel_node,
