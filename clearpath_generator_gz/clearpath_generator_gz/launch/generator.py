@@ -119,10 +119,10 @@ class GzLaunchGenerator(LaunchGenerator):
           parameters=[{'use_sim_time': True}],
           arguments=[[
             prefix_variable,
-            'imu_link/imu' + SensorLaunch.BaseLaunch.GZ_TO_ROS_IMU
+            'imu_0/imu' + SensorLaunch.BaseLaunch.GZ_TO_ROS_IMU
           ]],
           remappings=[
-            ([prefix_variable, 'imu_link/imu'],
+            ([prefix_variable, 'imu_0/imu'],
              'sensors/imu_0/data_raw')
           ]
         )
@@ -157,12 +157,12 @@ class GzLaunchGenerator(LaunchGenerator):
           parameters=[{'use_sim_time': True}],
           arguments=[[
             prefix_variable,
-            'navsat_link/navsat' + SensorLaunch.BaseLaunch.GZ_TO_ROS_NAVSAT
+            'gps_0/navsat' + SensorLaunch.BaseLaunch.GZ_TO_ROS_NAVSAT
           ]],
           remappings=[
             ([prefix_variable,
-              'navsat_link/navsat'],
-             'sensors/gps_0/navsat')
+              'gps_0/navsat'],
+             'sensors/gps_0/fix')
           ]
         )
 
