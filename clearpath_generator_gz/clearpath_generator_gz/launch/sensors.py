@@ -34,8 +34,8 @@ from clearpath_config.sensors.types.sensor import BaseSensor
 from clearpath_config.sensors.types.lidars_2d import BaseLidar2D, HokuyoUST, SickLMS1XX
 from clearpath_config.sensors.types.lidars_3d import BaseLidar3D, VelodyneLidar
 from clearpath_config.sensors.types.cameras import BaseCamera, IntelRealsense
-from clearpath_config.sensors.types.imu import BaseIMU, Microstrain
-from clearpath_config.sensors.types.gps import BaseGPS, SwiftNavDuro
+from clearpath_config.sensors.types.imu import BaseIMU, Microstrain, CHRoboticsUM6, RedshiftUM7
+from clearpath_config.sensors.types.gps import BaseGPS, SwiftNavDuro, Garmin18x, NovatelSmart6, NovatelSmart7
 
 from clearpath_generator_common.common import LaunchFile, ParamFile
 from clearpath_generator_common.launch.writer import LaunchWriter
@@ -256,9 +256,14 @@ class SensorLaunch():
         HokuyoUST.SENSOR_MODEL: Lidar2dLaunch,
         SickLMS1XX.SENSOR_MODEL: Lidar2dLaunch,
         IntelRealsense.SENSOR_MODEL: IntelRealsenseLaunch,
+        CHRoboticsUM6.SENSOR_MODEL: ImuLaunch,
         Microstrain.SENSOR_MODEL: ImuLaunch,
+        RedshiftUM7.SENSOR_MODEL: ImuLaunch,
         VelodyneLidar.SENSOR_MODEL: Lidar3dLaunch,
-        SwiftNavDuro.SENSOR_MODEL: GPSLaunch
+        Garmin18x.SENSOR_MODEL: GPSLaunch,
+        NovatelSmart6.SENSOR_MODEL: GPSLaunch,
+        NovatelSmart7.SENSOR_MODEL: GPSLaunch,
+        SwiftNavDuro.SENSOR_MODEL: GPSLaunch,
     }
 
     def __new__(cls,
