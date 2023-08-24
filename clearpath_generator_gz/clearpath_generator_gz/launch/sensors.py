@@ -35,7 +35,8 @@ from clearpath_config.sensors.types.lidars_2d import BaseLidar2D, HokuyoUST, Sic
 from clearpath_config.sensors.types.lidars_3d import BaseLidar3D, VelodyneLidar
 from clearpath_config.sensors.types.cameras import BaseCamera, IntelRealsense
 from clearpath_config.sensors.types.imu import BaseIMU, Microstrain, CHRoboticsUM6, RedshiftUM7
-from clearpath_config.sensors.types.gps import BaseGPS, SwiftNavDuro, Garmin18x, NovatelSmart6, NovatelSmart7
+from clearpath_config.sensors.types.gps import (BaseGPS, SwiftNavDuro, Garmin18x, NovatelSmart6,
+                                                NovatelSmart7)
 
 from clearpath_generator_common.common import LaunchFile, ParamFile
 from clearpath_generator_common.launch.writer import LaunchWriter
