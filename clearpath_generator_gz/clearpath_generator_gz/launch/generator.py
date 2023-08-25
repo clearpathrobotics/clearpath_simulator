@@ -119,21 +119,12 @@ class GzLaunchGenerator(LaunchGenerator):
           parameters=[{'use_sim_time': True}],
           arguments=[[
             prefix_variable,
-            'imu_link/imu' + SensorLaunch.BaseLaunch.GZ_TO_ROS_IMU
+            'imu_0/imu' + SensorLaunch.BaseLaunch.GZ_TO_ROS_IMU
           ]],
           remappings=[
-            ([prefix_variable, 'imu_link/imu'],
-             'platform/sensors/imu_0/data_raw')
+            ([prefix_variable, 'imu_0/imu'],
+             'sensors/imu_0/data_raw')
           ]
-        )
-
-        # IMU static tf
-        self.imu_0_static_tf_node = LaunchFile.get_static_tf_node(
-          name='imu_0',
-          namespace=self.namespace,
-          parent_link='imu_link',
-          child_link=self.robot_name + '/base_link/imu_link',
-          use_sim_time=True
         )
 
         # IMU filter
@@ -150,9 +141,9 @@ class GzLaunchGenerator(LaunchGenerator):
             namespace=self.namespace,
             parameters=[imu_filter_variable],
             remappings=[
-              ('imu/data_raw', 'platform/sensors/imu_0/data_raw'),
-              ('imu/mag', 'platform/sensors/imu_0/magnetic_field'),
-              ('imu/data', 'platform/sensors/imu_0/data'),
+              ('imu/data_raw', 'sensors/imu_0/data_raw'),
+              ('imu/mag', 'sensors/imu_0/magnetic_field'),
+              ('imu/data', 'sensors/imu_0/data'),
               ('/tf', 'tf'),
             ],
         )
@@ -166,22 +157,13 @@ class GzLaunchGenerator(LaunchGenerator):
           parameters=[{'use_sim_time': True}],
           arguments=[[
             prefix_variable,
-            'navsat_link/navsat' + SensorLaunch.BaseLaunch.GZ_TO_ROS_NAVSAT
+            'gps_0/navsat' + SensorLaunch.BaseLaunch.GZ_TO_ROS_NAVSAT
           ]],
           remappings=[
             ([prefix_variable,
-              'navsat_link/navsat'],
-             'platform/sensors/gps_0/navsat')
+              'gps_0/navsat'],
+             'sensors/gps_0/fix')
           ]
-        )
-
-        # GPS static tf
-        self.gps_0_static_tf_node = LaunchFile.get_static_tf_node(
-          name='gps_0',
-          namespace=self.namespace,
-          parent_link='navsat_link',
-          child_link=self.robot_name + '/base_link/navsat_link',
-          use_sim_time=True
         )
 
         # Static transform from <namespace>/odom to odom
@@ -210,11 +192,9 @@ class GzLaunchGenerator(LaunchGenerator):
                 self.odom_base_node,
                 self.prefix_launch_arg,
                 self.imu_0_bridge_node,
-                self.imu_0_static_tf_node,
                 self.imu_filter_arg,
                 self.imu_filter_node,
                 self.gps_0_bridge_node,
-                self.gps_0_static_tf_node
             ],
             Platform.A200: [
                 self.cmd_vel_node,
