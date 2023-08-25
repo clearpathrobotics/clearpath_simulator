@@ -2,8 +2,8 @@
 Changelog for package clearpath_generator_gz
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.1.1 (2023-08-25)
+------------------
 * Linting
 * Added additional supported IMUs and GPSs
 * Fix imu and gps bridge topic remapping
