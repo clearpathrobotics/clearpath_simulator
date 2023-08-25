@@ -2,6 +2,15 @@
 Changelog for package clearpath_generator_gz
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Linting
+* Added additional supported IMUs and GPSs
+* Fix imu and gps bridge topic remapping
+* Remove static tf nodes, no longer necessary
+* Update topic names to match other packages
+* Contributors: Hilary Luo
+
 0.1.0 (2023-08-17)
 ------------------
 * Renamed UST10 to UST
