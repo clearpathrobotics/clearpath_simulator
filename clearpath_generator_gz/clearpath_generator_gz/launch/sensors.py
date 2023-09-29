@@ -205,14 +205,6 @@ class SensorLaunch():
               self.get_gz_bridge_remap('image', sensor.name + '/color/image'),
             ]
 
-    class FlirBlackflyLaunch(CameraLaunch):
-        def __init__(self,
-                     sensor: FlirBlackfly,
-                     namespace: str,
-                     launch_path: str,
-                     param_path: str) -> None:
-            super().__init__(sensor, namespace, launch_path, param_path)
-
     class IntelRealsenseLaunch(CameraLaunch):
         def __init__(self,
                      sensor: IntelRealsense,
@@ -264,7 +256,7 @@ class SensorLaunch():
     MODEL = {
         HokuyoUST.SENSOR_MODEL: Lidar2dLaunch,
         SickLMS1XX.SENSOR_MODEL: Lidar2dLaunch,
-        FlirBlackfly.SENSOR_MODEL: FlirBlackflyLaunch,
+        FlirBlackfly.SENSOR_MODEL: CameraLaunch,
         IntelRealsense.SENSOR_MODEL: IntelRealsenseLaunch,
         CHRoboticsUM6.SENSOR_MODEL: ImuLaunch,
         Microstrain.SENSOR_MODEL: ImuLaunch,
