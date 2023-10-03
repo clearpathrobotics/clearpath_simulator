@@ -33,7 +33,7 @@
 from clearpath_config.sensors.types.sensor import BaseSensor
 from clearpath_config.sensors.types.lidars_2d import BaseLidar2D, HokuyoUST, SickLMS1XX
 from clearpath_config.sensors.types.lidars_3d import BaseLidar3D, VelodyneLidar
-from clearpath_config.sensors.types.cameras import BaseCamera, IntelRealsense
+from clearpath_config.sensors.types.cameras import BaseCamera, FlirBlackfly, IntelRealsense
 from clearpath_config.sensors.types.imu import BaseIMU, Microstrain, CHRoboticsUM6, RedshiftUM7
 from clearpath_config.sensors.types.gps import (BaseGPS, SwiftNavDuro, Garmin18x, NovatelSmart6,
                                                 NovatelSmart7)
@@ -256,6 +256,7 @@ class SensorLaunch():
     MODEL = {
         HokuyoUST.SENSOR_MODEL: Lidar2dLaunch,
         SickLMS1XX.SENSOR_MODEL: Lidar2dLaunch,
+        FlirBlackfly.SENSOR_MODEL: CameraLaunch,
         IntelRealsense.SENSOR_MODEL: IntelRealsenseLaunch,
         CHRoboticsUM6.SENSOR_MODEL: ImuLaunch,
         Microstrain.SENSOR_MODEL: ImuLaunch,
