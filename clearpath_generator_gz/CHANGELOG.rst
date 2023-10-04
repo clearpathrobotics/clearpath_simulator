@@ -2,6 +2,12 @@
 Changelog for package clearpath_generator_gz
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Initial addition of Blackfly (`#19 <https://github.com/clearpathrobotics/clearpath_simulator/issues/19>`_)
+  * Initial addition of Blackfly
+* Contributors: Hilary Luo
+
 0.1.1 (2023-08-25)
 ------------------
 * Linting
