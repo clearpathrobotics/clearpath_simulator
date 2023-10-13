@@ -201,6 +201,11 @@ class GzLaunchGenerator(LaunchGenerator):
                 self.odom_base_node,
                 self.prefix_launch_arg,
             ],
+            Platform.GENERIC: [
+                self.cmd_vel_node,
+                self.odom_base_node,
+                self.prefix_launch_arg,
+            ],
         }
 
     def generate_sensors(self) -> None:
