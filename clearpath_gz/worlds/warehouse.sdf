@@ -9,7 +9,7 @@
     <plugin name='ignition::gazebo::systems::UserCommands' filename='libignition-gazebo-user-commands-system.so'/>
     <plugin name='ignition::gazebo::systems::SceneBroadcaster' filename='libignition-gazebo-scene-broadcaster-system.so'/>
     <plugin name="ignition::gazebo::systems::Sensors" filename="libignition-gazebo-sensors-system.so">
-      <render_engine>ogre</render_engine>
+      <render_engine>ogre2</render_engine>
     </plugin>
     <plugin name="ignition::gazebo::systems::Imu" filename="libignition-gazebo-imu-system.so"/>
     <plugin name="ignition::gazebo::systems::NavSat" filename="libignition-gazebo-navsat-system.so"/>
