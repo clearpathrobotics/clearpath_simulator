@@ -2,6 +2,12 @@
 Changelog for package clearpath_gz
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* closes `#16 <https://github.com/clearpathrobotics/clearpath_simulator/issues/16>`_ (`#17 <https://github.com/clearpathrobotics/clearpath_simulator/issues/17>`_)
+  Fixes Lidar rays when running without a GPU, still works with GPU
+* Contributors: Arthur Gomes
+
 0.1.2 (2023-10-04)
 ------------------
 

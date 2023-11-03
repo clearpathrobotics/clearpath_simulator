@@ -2,6 +2,9 @@
 Changelog for package clearpath_generator_gz
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+
 0.1.2 (2023-10-04)
 ------------------
 * Initial addition of Blackfly (`#19 <https://github.com/clearpathrobotics/clearpath_simulator/issues/19>`_)
