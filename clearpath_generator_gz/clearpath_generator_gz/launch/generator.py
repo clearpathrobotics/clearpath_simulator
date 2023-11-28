@@ -201,6 +201,27 @@ class GzLaunchGenerator(LaunchGenerator):
                 self.odom_base_node,
                 self.prefix_launch_arg,
             ],
+            Platform.DD100: [
+                self.cmd_vel_node,
+                self.odom_base_node,
+                self.prefix_launch_arg,
+                self.imu_0_bridge_node,
+                self.imu_filter_arg,
+                self.imu_filter_node,
+            ],
+            Platform.GENERIC: [
+                self.cmd_vel_node,
+                self.odom_base_node,
+                self.prefix_launch_arg,
+            ],
+            Platform.W200: [
+                self.cmd_vel_node,
+                self.odom_base_node,
+                self.prefix_launch_arg,
+                self.imu_0_bridge_node,
+                self.imu_filter_arg,
+                self.imu_filter_node,
+            ],
         }
 
     def generate_sensors(self) -> None:
