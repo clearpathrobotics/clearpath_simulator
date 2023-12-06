@@ -40,7 +40,7 @@ for pose_element in ['x', 'y', 'yaw']:
     ARGUMENTS.append(DeclareLaunchArgument(pose_element, default_value='0.0',
                      description=f'{pose_element} component of the robot pose.'))
 
-ARGUMENTS.append(DeclareLaunchArgument('z', default_value='0.15',
+ARGUMENTS.append(DeclareLaunchArgument('z', default_value='0.3',
                  description='z component of the robot pose.'))
 
 
