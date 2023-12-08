@@ -2,8 +2,8 @@
 Changelog for package clearpath_gz
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.2.0 (2023-12-08)
+------------------
 * Lifted platform to 0.3 m
 * Updated links in the warehouse
 * Contributors: Luis Camero

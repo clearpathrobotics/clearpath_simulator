@@ -2,8 +2,8 @@
 Changelog for package clearpath_generator_gz
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.2.0 (2023-12-08)
+------------------
 * Added Warthog and Dingo to generator
 * Added Generic robot components
 * Sensor static tf should use robot namespace
