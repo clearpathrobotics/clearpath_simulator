@@ -2,6 +2,11 @@
 Changelog for package clearpath_generator_gz
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Added all dingo to generator
+* Contributors: Luis Camero
+
 0.2.0 (2023-12-08)
 ------------------
 * Added Warthog and Dingo to generator
