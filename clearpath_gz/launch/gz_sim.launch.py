@@ -16,8 +16,6 @@
 
 import os
 
-from pathlib import Path
-
 from ament_index_python.packages import get_package_share_directory
 
 from launch import LaunchDescription
@@ -42,29 +40,18 @@ def generate_launch_description():
     # Directories
     pkg_clearpath_gz = get_package_share_directory(
         'clearpath_gz')
-    pkg_clearpath_platform_description = get_package_share_directory(
-        'clearpath_platform_description')
-    pkg_clearpath_sensors_description = get_package_share_directory(
-        'clearpath_sensors_description')
-    pkg_clearpath_mounts_description = get_package_share_directory(
-        'clearpath_mounts_description')
-    pkg_velodyne_description = get_package_share_directory(
-        'velodyne_description')
-    pkg_realsense2_description = get_package_share_directory(
-        'realsense2_description')
     pkg_ros_gz_sim = get_package_share_directory(
         'ros_gz_sim')
 
-    # Set ignition resource path
+    # Determine all ros packages that are sourced
+    packages_paths = [os.path.join(p, 'share') for p in os.getenv('AMENT_PREFIX_PATH').split(':')]
+
+    # Set ignition resource path to include all sourced ros packages
     gz_sim_resource_path = SetEnvironmentVariable(
         name='IGN_GAZEBO_RESOURCE_PATH',
         value=[
-            os.path.join(pkg_clearpath_gz, 'worlds'), ':' +
-            str(Path(pkg_clearpath_platform_description).parent.resolve()), ':' +
-            str(Path(pkg_clearpath_sensors_description).parent.resolve()), ':' +
-            str(Path(pkg_clearpath_mounts_description).parent.resolve()), ':' +
-            str(Path(pkg_velodyne_description).parent.resolve()), ':' +
-            str(Path(pkg_realsense2_description).parent.resolve())])
+            os.path.join(pkg_clearpath_gz, 'worlds'),
+            ':' + ':'.join(packages_paths)])
 
     # Paths
     gz_sim_launch = PathJoinSubstitution(
