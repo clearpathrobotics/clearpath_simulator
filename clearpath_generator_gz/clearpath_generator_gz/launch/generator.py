@@ -262,6 +262,4 @@ class GzLaunchGenerator(LaunchGenerator):
         for component in self.platform_components[self.platform_model]:
             platform_service_launch_writer.add(component)
 
-        print("NEW")
-
         platform_service_launch_writer.generate_file()
