@@ -166,25 +166,6 @@ class GzLaunchGenerator(LaunchGenerator):
           ]
         )
 
-        # Static transform from <namespace>/odom to odom
-        # See https://github.com/ros-controls/ros2_controllers/pull/533
-        self.tf_namespaced_odom_publisher = LaunchFile.get_static_tf_node(
-            name='namespaced_odom',
-            namespace=self.namespace,
-            parent_link='odom',
-            child_link=self.namespace + '/odom',
-            use_sim_time=True
-        )
-
-        # Static transform from <namespace>/base_link to base_link
-        self.tf_namespaced_base_link_publisher = LaunchFile.get_static_tf_node(
-            name='namespaced_base_link',
-            namespace=self.namespace,
-            parent_link=self.namespace + '/base_link',
-            child_link='base_link',
-            use_sim_time=True
-        )
-
         # Components required for each platform
         self.platform_components = {
             Platform.J100: [
@@ -280,9 +261,5 @@ class GzLaunchGenerator(LaunchGenerator):
         # Platform components
         for component in self.platform_components[self.platform_model]:
             platform_service_launch_writer.add(component)
-
-        if self.namespace not in ('', '/'):
-            platform_service_launch_writer.add(self.tf_namespaced_odom_publisher)
-            platform_service_launch_writer.add(self.tf_namespaced_base_link_publisher)
 
         platform_service_launch_writer.generate_file()
