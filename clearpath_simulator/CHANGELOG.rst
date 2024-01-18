@@ -11,6 +11,16 @@ Changelog for package clearpath_simulator
 0.2.0 (2023-12-08)
 ------------------
 
+Forthcoming
+-----------
+* 0.2.2
+* Changes.
+* 0.2.1
+* Changes.
+* 0.2.0
+* Changes.
+* Contributors: Tony Baltovski
+
 0.1.3 (2023-11-03)
 ------------------
 

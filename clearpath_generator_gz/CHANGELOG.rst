@@ -17,6 +17,22 @@ Changelog for package clearpath_generator_gz
 * Sensor static tf should use robot namespace
 * Contributors: Luis Camero, Roni Kreinin
 
+Forthcoming
+-----------
+* Removed print
+* Removed namespaced tf_static
+* 0.2.2
+* Changes.
+* 0.2.1
+* Changes.
+* Added all dingo to generator
+* 0.2.0
+* Changes.
+* Added Warthog and Dingo to generator
+* Added Generic robot components
+* Sensor static tf should use robot namespace
+* Contributors: Luis Camero, Roni Kreinin, Tony Baltovski, luis-camero
+
 0.1.3 (2023-11-03)
 ------------------
 

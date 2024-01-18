@@ -16,6 +16,19 @@ Changelog for package clearpath_gz
 * Updated links in the warehouse
 * Contributors: Luis Camero
 
+Forthcoming
+-----------
+* 0.2.2
+* Changes.
+* Add all sourced ros packages to gazebo resource path to address user workspaces with custom meshes
+* 0.2.1
+* Changes.
+* 0.2.0
+* Changes.
+* Lifted platform to 0.3 m
+* Updated links in the warehouse
+* Contributors: Hilary Luo, Luis Camero, Tony Baltovski
+
 0.1.3 (2023-11-03)
 ------------------
 * closes `#16 <https://github.com/clearpathrobotics/clearpath_simulator/issues/16>`_ (`#17 <https://github.com/clearpathrobotics/clearpath_simulator/issues/17>`_)
