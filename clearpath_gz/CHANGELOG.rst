@@ -16,8 +16,8 @@ Changelog for package clearpath_gz
 * Updated links in the warehouse
 * Contributors: Luis Camero
 
-Forthcoming
------------
+0.2.3 (2024-01-18)
+------------------
 * 0.2.2
 * Changes.
 * Add all sourced ros packages to gazebo resource path to address user workspaces with custom meshes
