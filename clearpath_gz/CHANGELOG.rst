@@ -16,6 +16,11 @@ Changelog for package clearpath_gz
 * Updated links in the warehouse
 * Contributors: Luis Camero
 
+Forthcoming
+-----------
+* Commented out models that are currently broken in the fuel server
+* Contributors: Hilary Luo
+
 0.2.3 (2024-01-18)
 ------------------
 * 0.2.2
