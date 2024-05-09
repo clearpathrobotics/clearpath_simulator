@@ -34,6 +34,7 @@
 
 from clearpath_generator_common.param.generator import ParamGenerator
 from clearpath_generator_common.param.platform import PlatformParam
+from clearpath_generator_common.param.manipulators import ManipulatorParam
 
 
 class GzParamGenerator(ParamGenerator):
@@ -48,3 +49,12 @@ class GzParamGenerator(ParamGenerator):
                 self.platform_params_path)
             platform_param.generate_parameters(use_sim_time=True)
             platform_param.generate_parameter_file()
+
+    def generate_manipulators(self) -> None:
+        # MoveIt
+        moveit = ManipulatorParam(
+            ManipulatorParam.MOVEIT,
+            self.clearpath_config,
+            self.manipulators_params_path)
+        moveit.generate_parameters(use_sim_time=True)
+        moveit.generate_parameter_file()
