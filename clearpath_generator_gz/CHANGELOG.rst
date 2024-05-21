@@ -2,21 +2,6 @@
 Changelog for package clearpath_generator_gz
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-0.2.2 (2024-01-15)
-------------------
-
-0.2.1 (2023-12-11)
-------------------
-* Added all dingo to generator
-* Contributors: Luis Camero
-
-0.2.0 (2023-12-08)
-------------------
-* Added Warthog and Dingo to generator
-* Added Generic robot components
-* Sensor static tf should use robot namespace
-* Contributors: Luis Camero, Roni Kreinin
-
 0.2.4 (2024-04-15)
 ------------------
 
@@ -35,6 +20,21 @@ Changelog for package clearpath_generator_gz
 * Added Generic robot components
 * Sensor static tf should use robot namespace
 * Contributors: Luis Camero, Roni Kreinin, Tony Baltovski, luis-camero
+
+0.2.2 (2024-01-15)
+------------------
+
+0.2.1 (2023-12-11)
+------------------
+* Added all dingo to generator
+* Contributors: Luis Camero
+
+0.2.0 (2023-12-08)
+------------------
+* Added Warthog and Dingo to generator
+* Added Generic robot components
+* Sensor static tf should use robot namespace
+* Contributors: Luis Camero, Roni Kreinin
 
 0.1.3 (2023-11-03)
 ------------------
