@@ -126,6 +126,14 @@ def launch_setup(context, *args, **kwargs):
         arguments=['-s', setup_path]
     )
 
+    node_generate_semantic_description = Node(
+        package='clearpath_generator_common',
+        executable='generate_semantic_description',
+        name='generate_semantic_description',
+        output='screen',
+        arguments=['-s', setup_path]
+    )
+
     node_generate_launch = Node(
         package='clearpath_generator_gz',
         executable='generate_launch',
@@ -145,6 +153,13 @@ def launch_setup(context, *args, **kwargs):
     event_generate_description = RegisterEventHandler(
         event_handler=OnProcessExit(
             target_action=node_generate_description,
+            on_exit=[node_generate_semantic_description]
+        )
+    )
+
+    event_generate_semantic_description = RegisterEventHandler(
+        event_handler=OnProcessExit(
+            target_action=node_generate_semantic_description,
             on_exit=[node_generate_launch]
         )
     )
@@ -175,6 +190,7 @@ def launch_setup(context, *args, **kwargs):
     return [
         node_generate_description,
         event_generate_description,
+        event_generate_semantic_description,
         event_generate_launch,
         event_generate_param,
         rviz
