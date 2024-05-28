@@ -17,6 +17,11 @@ Changelog for package clearpath_generator_gz
 * Sensor static tf should use robot namespace
 * Contributors: Luis Camero, Roni Kreinin
 
+Forthcoming
+-----------
+* Added Zed to simulator
+* Contributors: Luis Camero
+
 0.2.4 (2024-04-15)
 ------------------
 
