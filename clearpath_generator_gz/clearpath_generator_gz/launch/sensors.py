@@ -33,7 +33,8 @@
 from clearpath_config.sensors.types.sensor import BaseSensor
 from clearpath_config.sensors.types.lidars_2d import BaseLidar2D, HokuyoUST, SickLMS1XX
 from clearpath_config.sensors.types.lidars_3d import BaseLidar3D, VelodyneLidar
-from clearpath_config.sensors.types.cameras import BaseCamera, FlirBlackfly, IntelRealsense
+from clearpath_config.sensors.types.cameras import (BaseCamera, FlirBlackfly, IntelRealsense,
+                                                    StereolabsZed)
 from clearpath_config.sensors.types.imu import BaseIMU, Microstrain, CHRoboticsUM6, RedshiftUM7
 from clearpath_config.sensors.types.gps import (BaseGPS, SwiftNavDuro, Garmin18x, NovatelSmart6,
                                                 NovatelSmart7)
@@ -235,6 +236,33 @@ class SensorLaunch():
                     sensor.get_name() + '/depth/image')
                 )
 
+    class StereolabsZedLaunch(CameraLaunch):
+
+        def __init__(self,
+                     sensor: StereolabsZed,
+                     namespace: str,
+                     launch_path: str,
+                     param_path: str) -> None:
+            super().__init__(sensor, namespace, launch_path, param_path)
+            self.gz_bridge_node.arguments.append(
+              self.get_gz_bridge_arg('points', self.GZ_TO_ROS_POINTCLOUD)
+            )
+
+            self.gz_bridge_node.remappings.append(
+              self.get_gz_bridge_remap(
+                'points',
+                sensor.get_name() + '/points')
+            )
+            self.gz_bridge_node.arguments.append(
+              self.get_gz_bridge_arg('depth_image', self.GZ_TO_ROS_IMAGE)
+            )
+
+            self.gz_bridge_node.remappings.append(
+              self.get_gz_bridge_remap(
+                'depth_image',
+                sensor.get_name() + '/depth/image')
+            )
+
     class GPSLaunch(BaseLaunch):
         def __init__(self,
                      sensor: BaseGPS,
@@ -258,6 +286,7 @@ class SensorLaunch():
         SickLMS1XX.SENSOR_MODEL: Lidar2dLaunch,
         FlirBlackfly.SENSOR_MODEL: CameraLaunch,
         IntelRealsense.SENSOR_MODEL: IntelRealsenseLaunch,
+        StereolabsZed.SENSOR_MODEL: StereolabsZedLaunch,
         CHRoboticsUM6.SENSOR_MODEL: ImuLaunch,
         Microstrain.SENSOR_MODEL: ImuLaunch,
         RedshiftUM7.SENSOR_MODEL: ImuLaunch,
