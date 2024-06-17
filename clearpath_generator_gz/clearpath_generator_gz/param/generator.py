@@ -32,13 +32,33 @@
 # modification, is not permitted without the express permission
 # of Clearpath Robotics.
 
+from clearpath_config.common.types.platform import Platform
+from clearpath_config.sensors.types.imu import BaseIMU
+from clearpath_config.sensors.types.gps import Garmin18x
+from clearpath_generator_gz.param.sensors import SensorParam
 from clearpath_generator_common.param.generator import ParamGenerator
 from clearpath_generator_common.param.platform import PlatformParam
+
+PLATFORMS = {
+    Platform.A200: {'imu': False, 'gps': False},
+    Platform.J100: {'imu': True, 'gps': True},
+    Platform.DD100: {'imu': True, 'gps': False},
+    Platform.DD150: {'imu': True, 'gps': False},
+    Platform.DO100: {'imu': True, 'gps': False},
+    Platform.DO150: {'imu': True, 'gps': False},
+    Platform.R100: {'imu': True, 'gps': False},
+    Platform.W200: {'imu': True, 'gps': False},
+}
 
 
 class GzParamGenerator(ParamGenerator):
     def generate_sensors(self) -> None:
-        pass
+        for sensor in self.clearpath_config.sensors.get_all_sensors():
+            sensor_param = SensorParam(
+                sensor,
+                self.clearpath_config.get_namespace(),
+                self.sensors_params_path)
+            sensor_param.generate_config()
 
     def generate_platform(self) -> None:
         for param in PlatformParam.PARAMETERS:
@@ -48,3 +68,19 @@ class GzParamGenerator(ParamGenerator):
                 self.platform_params_path)
             platform_param.generate_parameters(use_sim_time=True)
             platform_param.generate_parameter_file()
+        if PLATFORMS[self.clearpath_config.get_platform_model()]['imu']:
+            sensor_param = SensorParam(
+                BaseIMU(idx=0),
+                self.clearpath_config.get_namespace(),
+                self.sensors_params_path,
+                'sensors'
+            )
+            sensor_param.generate_config()
+        if PLATFORMS[self.clearpath_config.get_platform_model()]['gps']:
+            sensor_param = SensorParam(
+                Garmin18x(idx=0),
+                self.clearpath_config.get_namespace(),
+                self.sensors_params_path,
+                'sensors',
+            )
+            sensor_param.generate_config()
