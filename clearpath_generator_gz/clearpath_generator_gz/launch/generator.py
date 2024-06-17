@@ -102,29 +102,17 @@ class GzLaunchGenerator(LaunchGenerator):
                 ('/model/' + self.robot_name + '/tf', 'tf')
             ])
 
-        # Prefix launch arg
-        self.prefix_launch_arg = LaunchFile.LaunchArg(
-            'prefix',
-            default_value='/world/warehouse/model/robot/link/base_link/sensor/',
-            description='Ignition sensor topic prefix'
-        )
-        prefix_variable = LaunchFile.Variable('prefix')
-
         # Builtin IMU bridge
         self.imu_0_bridge_node = LaunchFile.Node(
           name='imu_0_gz_bridge',
           package='ros_gz_bridge',
           executable='parameter_bridge',
           namespace=self.namespace,
-          parameters=[{'use_sim_time': True}],
-          arguments=[[
-            prefix_variable,
-            'imu_0/imu' + SensorLaunch.BaseLaunch.GZ_TO_ROS_IMU
-          ]],
-          remappings=[
-            ([prefix_variable, 'imu_0/imu'],
-             'sensors/imu_0/data_raw')
-          ]
+          parameters=[{
+              'use_sim_time': True,
+              'config_file': os.path.join(
+                  self.sensors_params_path, 'imu_0.yaml')
+          }]
         )
 
         # IMU filter
@@ -154,16 +142,11 @@ class GzLaunchGenerator(LaunchGenerator):
           package='ros_gz_bridge',
           executable='parameter_bridge',
           namespace=self.namespace,
-          parameters=[{'use_sim_time': True}],
-          arguments=[[
-            prefix_variable,
-            'gps_0/navsat' + SensorLaunch.BaseLaunch.GZ_TO_ROS_NAVSAT
-          ]],
-          remappings=[
-            ([prefix_variable,
-              'gps_0/navsat'],
-             'sensors/gps_0/fix')
-          ]
+          parameters=[{
+              'use_sim_time': True,
+              'config_file': os.path.join(
+                  self.sensors_params_path, 'gps_0.yaml')
+          }]
         )
 
         # Components required for each platform
@@ -171,7 +154,6 @@ class GzLaunchGenerator(LaunchGenerator):
             Platform.J100: [
                 self.cmd_vel_node,
                 self.odom_base_node,
-                self.prefix_launch_arg,
                 self.imu_0_bridge_node,
                 self.imu_filter_arg,
                 self.imu_filter_node,
@@ -180,12 +162,10 @@ class GzLaunchGenerator(LaunchGenerator):
             Platform.A200: [
                 self.cmd_vel_node,
                 self.odom_base_node,
-                self.prefix_launch_arg,
             ],
             Platform.DD100: [
                 self.cmd_vel_node,
                 self.odom_base_node,
-                self.prefix_launch_arg,
                 self.imu_0_bridge_node,
                 self.imu_filter_arg,
                 self.imu_filter_node,
@@ -193,7 +173,6 @@ class GzLaunchGenerator(LaunchGenerator):
             Platform.DD150: [
                 self.cmd_vel_node,
                 self.odom_base_node,
-                self.prefix_launch_arg,
                 self.imu_0_bridge_node,
                 self.imu_filter_arg,
                 self.imu_filter_node,
@@ -201,7 +180,6 @@ class GzLaunchGenerator(LaunchGenerator):
             Platform.DO100: [
                 self.cmd_vel_node,
                 self.odom_base_node,
-                self.prefix_launch_arg,
                 self.imu_0_bridge_node,
                 self.imu_filter_arg,
                 self.imu_filter_node,
@@ -209,7 +187,6 @@ class GzLaunchGenerator(LaunchGenerator):
             Platform.DO150: [
                 self.cmd_vel_node,
                 self.odom_base_node,
-                self.prefix_launch_arg,
                 self.imu_0_bridge_node,
                 self.imu_filter_arg,
                 self.imu_filter_node,
@@ -217,12 +194,10 @@ class GzLaunchGenerator(LaunchGenerator):
             Platform.GENERIC: [
                 self.cmd_vel_node,
                 self.odom_base_node,
-                self.prefix_launch_arg,
             ],
             Platform.W200: [
                 self.cmd_vel_node,
                 self.odom_base_node,
-                self.prefix_launch_arg,
                 self.imu_0_bridge_node,
                 self.imu_filter_arg,
                 self.imu_filter_node,
@@ -233,12 +208,6 @@ class GzLaunchGenerator(LaunchGenerator):
         sensors_service_launch_writer = LaunchWriter(self.sensors_service_launch_file)
         sensors = self.clearpath_config.sensors.get_all_sensors()
 
-        prefix_launch_arg = LaunchFile.LaunchArg(
-                'prefix',
-                default_value='/world/warehouse/model/robot/link/base_link/sensor/',
-                description='Ignition sensor topic prefix'
-            )
-
         for sensor in sensors:
             if sensor.get_launch_enabled():
                 sensor_launch = SensorLaunch(
@@ -246,12 +215,10 @@ class GzLaunchGenerator(LaunchGenerator):
                         self.namespace,
                         self.sensors_launch_path,
                         self.sensors_params_path)
-                sensor_launch.prefix_launch_arg = prefix_launch_arg
                 sensor_launch.generate()
                 # Add sensor to top level sensors launch file
                 sensors_service_launch_writer.add_launch_file(sensor_launch.launch_file)
 
-        sensors_service_launch_writer.add(prefix_launch_arg)
         sensors_service_launch_writer.generate_file()
 
     def generate_platform(self) -> None:
