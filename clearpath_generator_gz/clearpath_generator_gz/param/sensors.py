@@ -154,7 +154,7 @@ class SensorParam():
 
             self.param_file.add(
                 ros_topic=self.get_ros_topic('scan'),
-                gz_topic=self.get_gz_topic(),
+                gz_topic=self.get_gz_topic('scan'),
                 ros_type=MessageType.ROS.LASER_SCAN,
                 gz_type=MessageType.GZ.LASER_SCAN,
             )
@@ -171,14 +171,14 @@ class SensorParam():
 
             self.param_file.add(
                 ros_topic=self.get_ros_topic('scan'),
-                gz_topic=self.get_gz_topic(),
+                gz_topic=self.get_gz_topic('scan'),
                 ros_type=MessageType.ROS.LASER_SCAN,
                 gz_type=MessageType.GZ.LASER_SCAN,
             )
 
             self.param_file.add(
                 ros_topic=self.get_ros_topic('points'),
-                gz_topic=self.get_gz_topic('points'),
+                gz_topic=self.get_gz_topic('scan/points'),
                 ros_type=MessageType.ROS.POINT_CLOUD,
                 gz_type=MessageType.GZ.POINT_CLOUD,
             )
@@ -195,7 +195,13 @@ class SensorParam():
 
             self.param_file.add(
                 ros_topic=self.get_ros_topic('data'),
-                gz_topic=self.get_gz_topic(),
+                gz_topic=self.get_gz_topic('data'),
+                ros_type=MessageType.ROS.IMU,
+                gz_type=MessageType.GZ.IMU,
+            )
+            self.param_file.add(
+                ros_topic=self.get_ros_topic('data_raw'),
+                gz_topic=self.get_gz_topic('data_raw'),
                 ros_type=MessageType.ROS.IMU,
                 gz_type=MessageType.GZ.IMU,
             )
@@ -260,7 +266,7 @@ class SensorParam():
 
             self.param_file.add(
                 ros_topic=self.get_ros_topic('fix'),
-                gz_topic=self.get_gz_topic(),
+                gz_topic=self.get_gz_topic('navsat'),
                 ros_type=MessageType.ROS.NAVSAT,
                 gz_type=MessageType.GZ.NAVSAT,
             )
@@ -286,6 +292,6 @@ class SensorParam():
                 sensor: BaseSensor,
                 namespace: str,
                 param_path: str,
-                namespace_prefix) -> BaseParam:
+                namespace_prefix: str = None) -> BaseParam:
         return SensorParam.MODEL.setdefault(sensor.SENSOR_MODEL, SensorParam.BaseParam)(
             sensor, namespace, param_path, namespace_prefix)
