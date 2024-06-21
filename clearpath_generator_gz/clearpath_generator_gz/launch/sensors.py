@@ -30,6 +30,11 @@
 # modification, is not permitted without the express permission
 # of Clearpath Robotics.
 
+from clearpath_config.sensors.types.cameras import (
+    BaseCamera,
+    IntelRealsense,
+    StereolabsZed
+)
 from clearpath_config.sensors.types.sensor import BaseSensor
 from clearpath_generator_common.common import LaunchFile, ParamFile
 from clearpath_generator_common.launch.writer import LaunchWriter
@@ -49,6 +54,11 @@ class SensorLaunch():
     GZ_TO_ROS_CAMERA_INFO = '@sensor_msgs/msg/CameraInfo[ignition.msgs.CameraInfo'
     GZ_TO_ROS_IMU = '@sensor_msgs/msg/Imu[ignition.msgs.IMU'
     GZ_TO_ROS_NAVSAT = '@sensor_msgs/msg/NavSatFix[ignition.msgs.NavSat'
+
+    RGBD_CAMERAS = [
+        IntelRealsense.SENSOR_MODEL,
+        StereolabsZed.SENSOR_MODEL
+    ]
 
     def __init__(
           self,
@@ -85,12 +95,60 @@ class SensorLaunch():
             }]
         )
 
+        self.extra_gz_nodes = []
+
+        # Cameras
+        if self.sensor.SENSOR_TYPE == BaseCamera.SENSOR_TYPE:
+            image_ns = '/' + self.namespace + self.name
+            image_topic = image_ns + '/image'
+
+            image_bridge_node = LaunchFile.Node(
+                name=self.name + '_gz_image_bridge',
+                namespace=self.namespace,
+                package='ros_gz_image',
+                executable='image_bridge',
+                parameters=[{
+                    'use_sim_time': True,
+                }],
+                arguments=[image_topic],
+                remappings=[
+                    (image_topic, image_ns + '/color/image'),
+                    (image_topic + '/compressed', image_ns + '/color/compressed'),
+                    (image_topic + '/compressedDepth', image_ns + '/color/compressedDepth'),
+                    (image_topic + '/theora', image_ns + '/color/theora'),
+                ]
+            )
+            self.extra_gz_nodes.append(image_bridge_node)
+        if self.sensor.SENSOR_MODEL in self.RGBD_CAMERAS:
+            depth_ns = '/' + self.namespace + self.name
+            depth_topic = depth_ns + '/depth_image'
+
+            depth_bridge_node = LaunchFile.Node(
+                name=self.name + '_gz_depth_bridge',
+                namespace=self.namespace,
+                package='ros_gz_image',
+                executable='image_bridge',
+                parameters=[{
+                    'use_sim_time': True,
+                }],
+                arguments=[depth_topic],
+                remappings=[
+                    (depth_topic, depth_ns + '/depth/image'),
+                    (depth_topic + '/compressed', depth_ns + '/depth/compressed'),
+                    (depth_topic + '/compressedDepth', depth_ns + '/depth/compressedDepth'),
+                    (depth_topic + '/theora', depth_ns + '/depth/theora'),
+                ]
+            )
+            self.extra_gz_nodes.append(depth_bridge_node)
+
     def generate(self):
         sensor_writer = LaunchWriter(self.launch_file)
         # Add sensor bridge and tf nodes
         sensor_writer.add(self.gz_bridge_node)
         sensor_writer.add(self.static_tf_node)
         sensor_writer.add(self.prefix_launch_arg)
+        for node in self.extra_gz_nodes:
+            sensor_writer.add(node)
         # Generate sensor launch file
         sensor_writer.generate_file()
 

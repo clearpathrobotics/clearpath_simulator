@@ -223,13 +223,6 @@ class SensorParam():
                 gz_type=MessageType.GZ.CAMERA_INFO,
             )
 
-            self.param_file.add(
-                ros_topic=self.get_ros_topic('color/image'),
-                gz_topic=self.get_gz_topic('image'),
-                ros_type=MessageType.ROS.IMAGE,
-                gz_type=MessageType.GZ.IMAGE,
-            )
-
     class RGBDCameraParam(CameraParam):
         def __init__(
                 self,
@@ -248,10 +241,10 @@ class SensorParam():
             )
 
             self.param_file.add(
-                ros_topic=self.get_ros_topic('depth/image'),
-                gz_topic=self.get_gz_topic('depth_image'),
-                ros_type=MessageType.ROS.IMAGE,
-                gz_type=MessageType.GZ.IMAGE,
+                ros_topic=self.get_ros_topic('depth/camera_info'),
+                gz_topic=self.get_gz_topic('camera_info'),
+                ros_type=MessageType.ROS.CAMERA_INFO,
+                gz_type=MessageType.GZ.CAMERA_INFO,
             )
 
     class GPSParam(BaseParam):
