@@ -17,8 +17,8 @@ Changelog for package clearpath_generator_gz
 * Sensor static tf should use robot namespace
 * Contributors: Luis Camero, Roni Kreinin
 
-Forthcoming
------------
+0.2.6 (2024-07-25)
+------------------
 * Add gz image transport for cameras
 * IMU data raw remap
 * Generate gazebo bridge config parameters
