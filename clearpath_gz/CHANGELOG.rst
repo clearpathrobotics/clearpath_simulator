@@ -16,6 +16,9 @@ Changelog for package clearpath_gz
 * Updated links in the warehouse
 * Contributors: Luis Camero
 
+Forthcoming
+-----------
+
 0.2.5 (2024-05-28)
 ------------------
 
