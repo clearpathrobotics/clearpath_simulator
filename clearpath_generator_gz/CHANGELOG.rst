@@ -2,6 +2,19 @@
 Changelog for package clearpath_generator_gz
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.2.6 (2024-07-25)
+------------------
+* Add gz image transport for cameras
+* IMU data raw remap
+* Generate gazebo bridge config parameters
+* Removed bridging using remappings and arguments
+* Contributors: Luis Camero
+
+0.2.5 (2024-05-28)
+------------------
+* Added Zed to simulator
+* Contributors: Luis Camero
+
 0.2.4 (2024-04-15)
 ------------------
 
