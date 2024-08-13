@@ -53,6 +53,9 @@ class GzLaunchGenerator(LaunchGenerator):
         for i, arg in enumerate(self.platform_launch_file.args):
             if arg[0] == 'use_sim_time':
                 self.platform_launch_file.args[i] = ('use_sim_time', 'true')
+        self.platform_launch_file.args.append(
+            ('use_manipulation_controllers', 'true')
+        )
 
         if self.namespace in ('', '/'):
             self.robot_name = 'robot'
@@ -195,6 +198,14 @@ class GzLaunchGenerator(LaunchGenerator):
                 self.cmd_vel_node,
                 self.odom_base_node,
             ],
+            Platform.R100: [
+                self.cmd_vel_node,
+                self.odom_base_node,
+                self.prefix_launch_arg,
+                self.imu_0_bridge_node,
+                self.imu_filter_arg,
+                self.imu_filter_node,
+            ],
             Platform.W200: [
                 self.cmd_vel_node,
                 self.odom_base_node,
@@ -230,3 +241,7 @@ class GzLaunchGenerator(LaunchGenerator):
             platform_service_launch_writer.add(component)
 
         platform_service_launch_writer.generate_file()
+
+    def generate_manipulators(self) -> None:
+        manipulators_service_launch_writer = LaunchWriter(self.manipulators_service_launch_file)
+        manipulators_service_launch_writer.generate_file()

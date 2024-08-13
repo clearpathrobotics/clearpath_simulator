@@ -37,6 +37,7 @@ from clearpath_config.sensors.types.imu import BaseIMU
 from clearpath_config.sensors.types.gps import Garmin18x
 from clearpath_generator_gz.param.sensors import SensorParam
 from clearpath_generator_common.param.generator import ParamGenerator
+from clearpath_generator_common.param.manipulators import ManipulatorParam
 from clearpath_generator_common.param.platform import PlatformParam
 
 PLATFORMS = {
@@ -84,3 +85,12 @@ class GzParamGenerator(ParamGenerator):
                 'sensors',
             )
             sensor_param.generate_config()
+
+    def generate_manipulators(self) -> None:
+        # MoveIt
+        moveit = ManipulatorParam(
+            ManipulatorParam.MOVEIT,
+            self.clearpath_config,
+            self.manipulators_params_path)
+        moveit.generate_parameters(use_sim_time=True)
+        moveit.generate_parameter_file()
