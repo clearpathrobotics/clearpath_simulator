@@ -201,7 +201,6 @@ class GzLaunchGenerator(LaunchGenerator):
             Platform.R100: [
                 self.cmd_vel_node,
                 self.odom_base_node,
-                self.prefix_launch_arg,
                 self.imu_0_bridge_node,
                 self.imu_filter_arg,
                 self.imu_filter_node,
