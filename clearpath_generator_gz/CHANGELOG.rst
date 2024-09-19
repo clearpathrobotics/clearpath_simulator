@@ -2,6 +2,14 @@
 Changelog for package clearpath_generator_gz
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Removed prefix_launch_arg no longer used
+* Add ridgeback
+* Fixed change log order
+* Added manipulators to generator and spawn
+* Contributors: Luis Camero
+
 0.2.6 (2024-07-25)
 ------------------
 * Add gz image transport for cameras

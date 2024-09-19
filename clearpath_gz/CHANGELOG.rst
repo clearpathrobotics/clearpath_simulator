@@ -2,6 +2,11 @@
 Changelog for package clearpath_gz
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Added manipulators to generator and spawn
+* Contributors: Luis Camero
+
 0.2.6 (2024-07-25)
 ------------------
 

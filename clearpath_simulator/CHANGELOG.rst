@@ -2,6 +2,11 @@
 Changelog for package clearpath_simulator
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Fixed changelogs
+* Contributors: Luis Camero
+
 0.2.6 (2024-07-25)
 ------------------
 
