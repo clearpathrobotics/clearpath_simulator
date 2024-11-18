@@ -48,7 +48,7 @@ def generate_launch_description():
 
     # Set ignition resource path to include all sourced ros packages
     gz_sim_resource_path = SetEnvironmentVariable(
-        name='IGN_GAZEBO_RESOURCE_PATH',
+        name='GZ_SIM_RESOURCE_PATH',
         value=[
             os.path.join(pkg_clearpath_gz, 'worlds'),
             ':' + ':'.join(packages_paths)])
