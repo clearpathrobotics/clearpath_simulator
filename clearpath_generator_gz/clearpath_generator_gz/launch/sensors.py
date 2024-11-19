@@ -48,12 +48,12 @@ class SensorLaunch():
     NAMESPACE = 'namespace'
 
     # gz to ros bridge parameters
-    GZ_TO_ROS_LASERSCAN = '@sensor_msgs/msg/LaserScan[ignition.msgs.LaserScan'
-    GZ_TO_ROS_POINTCLOUD = '@sensor_msgs/msg/PointCloud2[ignition.msgs.PointCloudPacked'
-    GZ_TO_ROS_IMAGE = '@sensor_msgs/msg/Image[ignition.msgs.Image'
-    GZ_TO_ROS_CAMERA_INFO = '@sensor_msgs/msg/CameraInfo[ignition.msgs.CameraInfo'
-    GZ_TO_ROS_IMU = '@sensor_msgs/msg/Imu[ignition.msgs.IMU'
-    GZ_TO_ROS_NAVSAT = '@sensor_msgs/msg/NavSatFix[ignition.msgs.NavSat'
+    GZ_TO_ROS_LASERSCAN = '@sensor_msgs/msg/LaserScan[gz.msgs.LaserScan'
+    GZ_TO_ROS_POINTCLOUD = '@sensor_msgs/msg/PointCloud2[gz.msgs.PointCloudPacked'
+    GZ_TO_ROS_IMAGE = '@sensor_msgs/msg/Image[gz.msgs.Image'
+    GZ_TO_ROS_CAMERA_INFO = '@sensor_msgs/msg/CameraInfo[gz.msgs.CameraInfo'
+    GZ_TO_ROS_IMU = '@sensor_msgs/msg/Imu[gz.msgs.IMU'
+    GZ_TO_ROS_NAVSAT = '@sensor_msgs/msg/NavSatFix[gz.msgs.NavSat'
 
     RGBD_CAMERAS = [
         IntelRealsense.SENSOR_MODEL,

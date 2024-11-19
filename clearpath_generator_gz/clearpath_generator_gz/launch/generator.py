@@ -41,9 +41,9 @@ from clearpath_generator_gz.launch.sensors import SensorLaunch
 
 
 class GzLaunchGenerator(LaunchGenerator):
-    GZ_TO_ROS_TWIST = '@geometry_msgs/msg/Twist[ignition.msgs.Twist'
-    ROS_TO_GZ_TWIST = '@geometry_msgs/msg/Twist]ignition.msgs.Twist'
-    GZ_TO_ROS_TF = '@tf2_msgs/msg/TFMessage[ignition.msgs.Pose_V'
+    GZ_TO_ROS_TWIST = '@geometry_msgs/msg/TwistStamped[gz.msgs.Twist'
+    ROS_TO_GZ_TWIST = '@geometry_msgs/msg/TwistStamped]gz.msgs.Twist'
+    GZ_TO_ROS_TF = '@tf2_msgs/msg/TFMessage[gz.msgs.Pose_V'
 
     def __init__(self, setup_path: str = '/etc/clearpath/') -> None:
         super().__init__(setup_path)
@@ -70,7 +70,7 @@ class GzLaunchGenerator(LaunchGenerator):
         cmd_vel_robot_bridge_arg = '/model/' + self.robot_name + '/cmd_vel' + self.ROS_TO_GZ_TWIST
         cmd_vel_robot_bridge_remap = (
             '/model/' + self.robot_name + '/cmd_vel',
-            'platform/cmd_vel_unstamped'
+            'platform/cmd_vel'
           )
 
         self.cmd_vel_node = LaunchFile.Node(
