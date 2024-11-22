@@ -59,7 +59,7 @@
           <geometry>
             <mesh>
               <uri>
-                model://agriculture_world/agriculture_world.dae
+                model://solar_farm/agriculture_world.dae
               </uri>
             </mesh>
           </geometry>
@@ -68,7 +68,7 @@
           <geometry>
             <mesh>
               <uri>
-                model://agriculture_world/agriculture_world.dae
+                model://solar_farm/agriculture_world.dae
               </uri>
             </mesh>
           </geometry>
