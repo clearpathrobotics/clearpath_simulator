@@ -1,0 +1,153 @@
+<?xml version='1.0' encoding='ASCII'?>
+<sdf version='1.4'>
+  <world name='orchard'>
+    <physics type='ode'>
+      <max_step_size>0.003</max_step_size>
+      <real_time_factor>1.0</real_time_factor>
+      <real_time_update_rate>1000</real_time_update_rate>
+      <gravity>0 0 -9.8</gravity>
+    </physics>
+    <plugin name='gz::sim::systems::Physics' filename='libgz-sim-physics-system.so'/>
+    <plugin name='gz::sim::systems::UserCommands' filename='libgz-sim-user-commands-system.so'/>
+    <plugin name='gz::sim::systems::SceneBroadcaster' filename='libgz-sim-scene-broadcaster-system.so'/>
+    <plugin name="gz::sim::systems::Sensors" filename="libgz-sim-sensors-system.so">
+      <render_engine>ogre2</render_engine>
+    </plugin>
+    <plugin name="gz::sim::systems::Imu" filename="libgz-sim-imu-system.so"/>
+    <plugin name="gz::sim::systems::NavSat" filename="libgz-sim-navsat-system.so"/>
+
+    <scene>
+      <ambient>1 1 1 1</ambient>
+      <background>0.3 0.7 0.9 1</background>
+      <shadows>0</shadows>
+      <grid>false</grid>
+      <sky>
+        <clouds>
+          <speed>12</speed>
+        </clouds>
+      </sky>
+      <shadows>1</shadows>
+    </scene>
+    <light name='sun' type='directional'>
+      <cast_shadows>1</cast_shadows>
+      <pose>0 0 10 0 -0 0</pose>
+      <diffuse>1.0 1.0 1.0 1</diffuse>
+      <specular>0.2 0.2 0.2 1</specular>
+      <attenuation>
+        <range>1000</range>
+        <constant>0.9</constant>
+        <linear>0.01</linear>
+        <quadratic>0.001</quadratic>
+      </attenuation>
+      <direction>-0.5 0.5 -1.0</direction>
+    </light>
+
+    <!-- Origin placed on a random olive orchard somewhere in Greece -->
+    <spherical_coordinates>
+      <surface_model>EARTH_WGS84</surface_model>
+      <latitude_deg>39.512152</latitude_deg>
+      <longitude_deg>22.426669</longitude_deg>
+      <elevation>344</elevation>
+      <heading_deg>0</heading_deg>
+    </spherical_coordinates>
+
+    <model name='orchard'>
+      <pose>-10 -10 0 0 0 0</pose>
+      <static>true</static>
+      <link name='orchard'>
+        <collision name='orchard_collision'>
+          <geometry>
+            <mesh>
+              <uri>
+                model://orchard/orchard_world.dae
+              </uri>
+            </mesh>
+          </geometry>
+        </collision>
+        <visual name='orchard_visual'>
+          <geometry>
+            <mesh>
+              <uri>
+                model://orchard/orchard_world.dae
+              </uri>
+            </mesh>
+          </geometry>
+        </visual>
+      </link>
+    </model>
+
+    <model name='orchard_trees'>
+      <pose>-10 -10 0 0 0 0</pose>
+      <static>true</static>
+      <link name='orchard_trees'>
+        <collision name='orchard_trees_collision'>
+          <geometry>
+            <mesh>
+              <uri>
+                model://orchard/orchard_trunks.dae
+              </uri>
+            </mesh>
+          </geometry>
+        </collision>
+        <visual name='orchard_trees_visual'>
+          <geometry>
+            <mesh>
+              <uri>
+                model://orchard/orchard_trunks.dae
+              </uri>
+            </mesh>
+          </geometry>
+        </visual>
+      </link>
+    </model>
+    <model name='orchard_leaves'>
+      <pose>-10 -10 0 0 0 0</pose>
+      <static>true</static>
+      <link name='orchard_leaves'>
+        <collision name='orchard_leaves_collision'>
+          <geometry>
+            <mesh>
+              <uri>
+                model://orchard/orchard_leaves.dae
+              </uri>
+            </mesh>
+          </geometry>
+        </collision>
+        <visual name='orchard_leaves_visual'>
+          <geometry>
+            <mesh>
+              <uri>
+                model://orchard/orchard_leaves.dae
+              </uri>
+            </mesh>
+          </geometry>
+        </visual>
+      </link>
+    </model>
+
+    <model name='base_station'>
+      <pose>-8 -8 0 0 0 0</pose>
+      <static>true</static>
+      <link name='base_station'>
+        <collision name='base_station_collision'>
+          <geometry>
+            <mesh>
+              <uri>
+                model://accessories/base_station_with_tripod.stl
+              </uri>
+            </mesh>
+          </geometry>
+        </collision>
+        <visual name='base_station_visual'>
+          <geometry>
+            <mesh>
+              <uri>
+                model://accessories/base_station_with_tripod.dae
+              </uri>
+            </mesh>
+          </geometry>
+        </visual>
+      </link>
+    </model>
+  </world>
+</sdf>
