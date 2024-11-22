@@ -1,0 +1,104 @@
+<?xml version='1.0' encoding='ASCII'?>
+<sdf version='1.4'>
+  <world name='solar_farm'>
+    <physics type='ode'>
+      <max_step_size>0.003</max_step_size>
+      <real_time_factor>1.0</real_time_factor>
+      <real_time_update_rate>1000</real_time_update_rate>
+      <gravity>0 0 -9.8</gravity>
+    </physics>
+    <plugin name='gz::sim::systems::Physics' filename='libgz-sim-physics-system.so'/>
+    <plugin name='gz::sim::systems::UserCommands' filename='libgz-sim-user-commands-system.so'/>
+    <plugin name='gz::sim::systems::SceneBroadcaster' filename='libgz-sim-scene-broadcaster-system.so'/>
+    <plugin name="gz::sim::systems::Sensors" filename="libgz-sim-sensors-system.so">
+      <render_engine>ogre2</render_engine>
+    </plugin>
+    <plugin name="gz::sim::systems::Imu" filename="libgz-sim-imu-system.so"/>
+    <plugin name="gz::sim::systems::NavSat" filename="libgz-sim-navsat-system.so"/>
+
+    <scene>
+      <ambient>1 1 1 1</ambient>
+      <background>0.3 0.7 0.9 1</background>
+      <shadows>0</shadows>
+      <grid>false</grid>
+      <sky>
+        <clouds>
+          <speed>12</speed>
+        </clouds>
+      </sky>
+      <shadows>1</shadows>
+    </scene>
+    <light name='sun' type='directional'>
+      <cast_shadows>1</cast_shadows>
+      <pose>0 0 10 0 -0 0</pose>
+      <diffuse>1.0 1.0 1.0 1</diffuse>
+      <specular>0.2 0.2 0.2 1</specular>
+      <attenuation>
+        <range>1000</range>
+        <constant>0.9</constant>
+        <linear>0.01</linear>
+        <quadratic>0.001</quadratic>
+      </attenuation>
+      <direction>-0.5 0.5 -1.0</direction>
+    </light>
+
+    <!-- Origin placed somewhere near Clearpath's office in Waterloo, ON, Canada -->
+    <spherical_coordinates>
+      <surface_model>EARTH_WGS84</surface_model>
+      <latitude_deg>43.500720</latitude_deg>
+      <longitude_deg>-80.546793</longitude_deg>
+      <elevation>329</elevation>
+      <heading_deg>0</heading_deg>
+    </spherical_coordinates>
+
+    <model name='office'>
+      <pose>0 0 0 0 0 0</pose>
+      <static>true</static>
+      <link name='office'>
+        <collision name='office_collision'>
+          <geometry>
+            <mesh>
+              <uri>
+                model://office/office.dae
+              </uri>
+            </mesh>
+          </geometry>
+        </collision>
+        <visual name='office_visual'>
+          <geometry>
+            <mesh>
+              <uri>
+                model://office/office.dae
+              </uri>
+            </mesh>
+          </geometry>
+        </visual>
+      </link>
+    </model>
+
+    <model name='charge_dock'>
+      <pose>23 -5 0 0 0 2.356194490192345</pose>
+      <static>true</static>
+      <link name='charge_dock'>
+        <collision name='charge_dock_collision'>
+          <geometry>
+            <mesh>
+              <uri>
+                model://accessories/wibotic_tr301.stl
+              </uri>
+            </mesh>
+          </geometry>
+        </collision>
+        <visual name='charge_dock_visual'>
+          <geometry>
+            <mesh>
+              <uri>
+                model://accessories/wibotic_tr301.dae
+              </uri>
+            </mesh>
+          </geometry>
+        </visual>
+      </link>
+    </model>
+  </world>
+</sdf>
