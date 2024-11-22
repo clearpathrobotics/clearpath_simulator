@@ -50,8 +50,9 @@ def generate_launch_description():
     gz_sim_resource_path = SetEnvironmentVariable(
         name='GZ_SIM_RESOURCE_PATH',
         value=[
-            os.path.join(pkg_clearpath_gz, 'worlds'),
-            ':' + ':'.join(packages_paths)])
+            os.path.join(pkg_clearpath_gz, 'worlds') + ':',
+            os.path.join(pkg_clearpath_gz, 'meshes') + ':',
+            ':'.join(packages_paths)])
 
     # Paths
     gz_sim_launch = PathJoinSubstitution(
