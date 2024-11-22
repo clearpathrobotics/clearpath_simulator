@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='ASCII'?>
 <sdf version='1.4'>
-  <world name='solar_farm'>
+  <world name='office'>
     <physics type='ode'>
       <max_step_size>0.003</max_step_size>
       <real_time_factor>1.0</real_time_factor>
