@@ -60,6 +60,7 @@
               <uri>
                 model://pipeline/inspection_world.dae
               </uri>
+              <scale>2 2 1</scale>
             </mesh>
           </geometry>
         </collision>
@@ -69,6 +70,7 @@
               <uri>
                 model://pipeline/inspection_world.dae
               </uri>
+              <scale>2 2 1</scale>
             </mesh>
           </geometry>
         </visual>
@@ -86,6 +88,7 @@
               <uri>
                 model://pipeline/inspection_water.dae
               </uri>
+              <scale>2 2 1</scale>
             </mesh>
           </geometry>
         </visual>
