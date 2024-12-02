@@ -163,6 +163,10 @@ class GzLaunchGenerator(LaunchGenerator):
                 self.cmd_vel_node,
                 self.odom_base_node,
             ],
+            Platform.A300: [
+                self.cmd_vel_node,
+                self.odom_base_node,
+            ],
             Platform.DD100: [
                 self.cmd_vel_node,
                 self.odom_base_node,

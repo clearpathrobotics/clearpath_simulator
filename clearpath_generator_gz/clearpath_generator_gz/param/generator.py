@@ -42,6 +42,7 @@ from clearpath_generator_gz.param.sensors import SensorParam
 
 PLATFORMS = {
     Platform.A200: {'imu': False, 'gps': False},
+    Platform.A300: {'imu': False, 'gps': False},
     Platform.J100: {'imu': True, 'gps': True},
     Platform.DD100: {'imu': True, 'gps': False},
     Platform.DD150: {'imu': True, 'gps': False},
