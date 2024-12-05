@@ -31,6 +31,7 @@
 # of Clearpath Robotics.
 
 from clearpath_config.sensors.types.cameras import (
+    AxisCamera,
     BaseCamera,
     IntelRealsense,
     StereolabsZed
@@ -55,9 +56,15 @@ class SensorLaunch():
     GZ_TO_ROS_IMU = '@sensor_msgs/msg/Imu[gz.msgs.IMU'
     GZ_TO_ROS_NAVSAT = '@sensor_msgs/msg/NavSatFix[gz.msgs.NavSat'
 
+    ROS_TO_GZ_FLOAT = '@std_msgs/msg/Float64]gz.msgs.Double'
+
     RGBD_CAMERAS = [
         IntelRealsense.SENSOR_MODEL,
         StereolabsZed.SENSOR_MODEL
+    ]
+
+    PTZ_CAMERAS = [
+        AxisCamera.SENSOR_MODEL
     ]
 
     def __init__(
@@ -119,6 +126,7 @@ class SensorLaunch():
                 ]
             )
             self.extra_gz_nodes.append(image_bridge_node)
+
         if self.sensor.SENSOR_MODEL in self.RGBD_CAMERAS:
             depth_ns = '/' + self.namespace + self.name
             depth_topic = depth_ns + '/depth_image'
@@ -140,6 +148,21 @@ class SensorLaunch():
                 ]
             )
             self.extra_gz_nodes.append(depth_bridge_node)
+
+        if self.sensor.SENSOR_MODEL in self.PTZ_CAMERAS:
+            cmd_ns = '/' + self.namespace + self.name
+            cmd_bridge_node = LaunchFile.Node(
+                name=self.name + '_gz_cmd_node',
+                namespace=self.namespace,
+                package='ros_gz_bridge',
+                executable='parameter_bridge',
+                parameters=[{'use_sim_time': True}],
+                arguments = [
+                    cmd_ns + '/cmd_pan_vel' + self.ROS_TO_GZ_FLOAT,
+                    cmd_ns + '/cmd_tilt_vel' + self.ROS_TO_GZ_FLOAT,
+                ]
+            )
+            self.extra_gz_nodes.append(cmd_bridge_node)
 
     def generate(self):
         sensor_writer = LaunchWriter(self.launch_file)
