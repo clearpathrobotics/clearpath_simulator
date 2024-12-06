@@ -55,6 +55,7 @@ class SensorLaunch():
     GZ_TO_ROS_CAMERA_INFO = '@sensor_msgs/msg/CameraInfo[gz.msgs.CameraInfo'
     GZ_TO_ROS_IMU = '@sensor_msgs/msg/Imu[gz.msgs.IMU'
     GZ_TO_ROS_NAVSAT = '@sensor_msgs/msg/NavSatFix[gz.msgs.NavSat'
+    GZ_TO_ROS_JOINTSTATE = '@sensor_msgs/msg/JointState[gz.msgs.Model'
 
     ROS_TO_GZ_FLOAT = '@std_msgs/msg/Float64]gz.msgs.Double'
 
@@ -152,7 +153,7 @@ class SensorLaunch():
         if self.sensor.SENSOR_MODEL in self.PTZ_CAMERAS:
             cmd_ns = '/' + self.namespace + self.name
             cmd_bridge_node = LaunchFile.Node(
-                name=self.name + '_gz_cmd_node',
+                name=self.name + '_gz_cmd_bridge',
                 namespace=self.namespace,
                 package='ros_gz_bridge',
                 executable='parameter_bridge',
@@ -160,7 +161,13 @@ class SensorLaunch():
                 arguments = [
                     cmd_ns + '/cmd_pan_vel' + self.ROS_TO_GZ_FLOAT,
                     cmd_ns + '/cmd_tilt_vel' + self.ROS_TO_GZ_FLOAT,
-                ]
+                    cmd_ns + '/pan_joint_state' + self.GZ_TO_ROS_JOINTSTATE,
+                    cmd_ns + '/tilt_joint_state' + self.GZ_TO_ROS_JOINTSTATE,
+                ],
+                remappings=[
+                    (cmd_ns + '/pan_joint_state', '/' + self._robot_namespace + '/platform/joint_states'),
+                    (cmd_ns + '/tilt_joint_state', '/' + self._robot_namespace + '/platform/joint_states')
+                ],
             )
             self.extra_gz_nodes.append(cmd_bridge_node)
 
