@@ -1,0 +1,359 @@
+#!/usr/bin/env python3
+# Software License Agreement (BSD)
+#
+# @author    Chris Iverach-Brereton <civerachb@clearpathrobotics.com>
+# @copyright (c) 2024, Clearpath Robotics, Inc., All rights reserved.
+#
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are met:
+# * Redistributions of source code must retain the above copyright notice,
+#   this list of conditions and the following disclaimer.
+# * Redistributions in binary form must reproduce the above copyright notice,
+#   this list of conditions and the following disclaimer in the documentation
+#   and/or other materials provided with the distribution.
+# * Neither the name of Clearpath Robotics nor the names of its contributors
+#   may be used to endorse or promote products derived from this software
+#   without specific prior written permission.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+# ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+# LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+# CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+# SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+# INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+# CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+# ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+# POSSIBILITY OF SUCH DAMAGE.
+
+# Redistribution and use in source and binary forms, with or without
+# modification, is not permitted without the express permission
+# of Clearpath Robotics.
+"""
+Implements the PTZ Action Server interface for compatible cameras in-simulation
+
+Zoom is implemented as a simple digital zoom, since changing the lens characteristics
+of simulated cameras does not appear to be well-supported
+
+The clearpath_sensor_description package uses simple JointController interfaces
+for the pan & tilt actuators, which provide velocity control over the motors.
+"""
+from math import atan2, cos, sin
+
+import rclpy
+from rclpy.action import ActionServer, CancelResponse
+from rclpy.callback_groups import ReentrantCallbackGroup
+from rclpy.executors import MultiThreadedExecutor
+from rclpy.node import Node
+from rclpy.qos import qos_profile_sensor_data
+
+import cv2
+import cv_bridge
+from ptz_action_server_msgs.action import *
+from ptz_action_server_msgs.msg import *
+from sensor_msgs.msg import Image, JointState
+from std_msgs.msg import Float64
+
+def clamp(x, low, high):
+    if x < low:
+        return low
+    if x > high:
+        return high
+    return x
+
+def rescale(x, old_min, old_max, new_min, new_max, clamp=True):
+    if clamp and x < old_min:
+        return new_min
+    if clamp and x > old_max:
+        return new_max
+    return (x - old_min) / (old_max - old_min) * (new_max - new_min) + new_min
+
+def normalize_angle(theta):
+    return atan2(sin(theta), cos(theta))
+
+
+class PtzControlNode(Node):
+
+    def __init__(self):
+        super().__init__('ptz_control_node')
+
+        self.bridge = cv_bridge.CvBridge()
+
+        # limit to 5x zoom for simulation; past this the pixel density gets pretty bad
+        self.zoom_level = 1.0
+        self.min_zoom = 1.0
+        self.max_zoom = 5.0
+
+        self.pan_speed = 0.0
+        self.pan_position = 0.0
+        self.tilt_speed = 0.0
+        self.tilt_position = 0.0
+
+        self.zoom_delta = 0.0
+
+        self.declare_parameters(
+            namespace='',
+            parameters=[
+                ('camera_name', 'camera_0')
+            ]
+        )
+
+        self.camera_name = self.get_parameter('camera_name').value
+
+        self.cmd_pan_pub = self.create_publisher(
+            Float64, 'cmd_pan_vel', 1
+        )
+        self.cmd_tilt_pub = self.create_publisher(
+            Float64, 'cmd_tilt_vel', 1
+        )
+
+        self.ptz_state = PtzState()
+        self.ptz_state_pub = self.create_publisher(
+            PtzState, 'ptz_state', 1
+        )
+
+        self.image_pub = self.create_publisher(
+            Image, 'image_out', qos_profile=qos_profile_sensor_data)
+
+        self.joint_state_sub = self.create_subscription(
+            JointState, 'joint_states', self.joint_state_cb, qos_profile=qos_profile_sensor_data
+        )
+
+        self.image_sub = self.create_subscription(
+            Image, 'image_in', self.image_cb, qos_profile=qos_profile_sensor_data)
+
+        self.cmd_vel_sub = self.create_subscription(Ptz, 'cmd/velocity', self.cmd_velocity_cb, 1)
+
+        self.set_ptz_absolute_srv = ActionServer(
+            self,
+            PtzMove,
+            'move_ptz/position_abs',
+            self.move_ptz_abs_cb,
+            cancel_callback=self.cancel_ptz_abs_cb,
+            callback_group=ReentrantCallbackGroup()
+        )
+
+        self.set_ptz_relative_srv = ActionServer(
+            self,
+            PtzMove,
+            'move_ptz/position_rel',
+            self.move_ptz_rel_cb,
+            cancel_callback=self.cancel_ptz_rel_cb,
+            callback_group=ReentrantCallbackGroup()
+        )
+
+        self.set_ptz_velocity_srv = ActionServer(
+            self,
+            PtzMove,
+            'move_ptz/velocity',
+            self.move_ptz_vel_cb,
+            cancel_callback=self.cancel_ptz_vel_cb,
+            callback_group=ReentrantCallbackGroup()
+        )
+
+        self.state_timer = self.create_timer(1, self.publish_state)
+
+    def publish_state(self):
+        self.ptz_state.pan = self.pan_position
+        self.ptz_state.tilt = self.tilt_position
+        self.ptz_state.zoom = self.zoom_level
+        self.ptz_state_pub.publish(self.ptz_state)
+
+    def cmd_velocity_cb(self, cmd):
+        # publish the pan & tilt speeds to the gazebo controller
+        msg = Float64()
+        msg.data = float(cmd.pan)
+        self.cmd_pan_pub.publish(msg)
+        msg.data = float(cmd.tilt)
+        self.cmd_tilt_pub.publish(msg)
+
+        # track the requested zoom level
+        self.zoom_delta = cmd.zoom
+
+    def image_cb(self, image):
+        self.zoom_level = clamp(self.zoom_level + self.zoom_delta, self.min_zoom, self.max_zoom)
+
+        if self.zoom_level == 1.0:
+            self.image_pub.publish(image)
+        else:
+            # zoom into the centre of the image and publish that
+            cv_img = self.bridge.imgmsg_to_cv2(image, "8UC3")
+            (rows,cols,channels) = cv_img.shape
+            z = self.zoom_level    # this is volatile, so store a local copy!
+            w = cols / z
+            h = rows / z
+            cv_img = cv_img[int(rows/2 - h/2) : int(rows/2 + h/2), int(cols/2 - w/2) : int(cols/2 + w/2)]
+            cv_img = cv2.resize(cv_img, (cols, rows))
+
+            # convert back to a ROS image
+            zoomed_image = self.bridge.cv2_to_imgmsg(cv_img, "rgb8")
+            zoomed_image.header = image.header
+
+            self.image_pub.publish(zoomed_image)
+
+    def joint_state_cb(self, joints):
+        if f'{self.camera_name}_pan_joint' in joints.name:
+            index = joints.name.index(f'{self.camera_name}_pan_joint')
+            self.pan_position = normalize_angle(joints.position[index])
+            self.pan_speed = joints.velocity[index]
+        if f'{self.camera_name}_tilt_joint' in joints.name:
+            index = joints.name.index(f'{self.camera_name}_tilt_joint')
+            self.tilt_position = normalize_angle(joints.position[index])
+            self.tilt_speed = joints.velocity[index]
+
+    def move_ptz_abs_cb(self, goal_handle):
+        """
+        Move the camera to an absolute PTZ position
+
+        @param goal_handle
+        """
+        cmd_pan = goal_handle.request.ptz.pan
+        cmd_tilt = goal_handle.request.ptz.tilt
+        cmd_zoom = goal_handle.request.ptz.zoom
+
+        self.ptz_state.mode = PtzState.MODE_POSITION
+        reached_goal = self.wait_for_position(goal_handle, cmd_pan, cmd_tilt, cmd_zoom)
+        self.ptz_state.mode = PtzState.MODE_IDLE
+
+        result = PtzMove.Result()
+        result.success = reached_goal
+        if reached_goal:
+            goal_handle.succeed()
+
+        return result
+
+    def move_ptz_rel_cb(self, goal_handle):
+        """
+        Move the camera to an relative PTZ position
+
+        @param goal_handle
+        """
+        cmd_pan = normalize_angle(self.pan_position + goal_handle.request.ptz.pan)
+        cmd_tilt = normalize_angle(self.tilt_position + goal_handle.request.ptz.tilt)
+        cmd_zoom = clamp(
+            self.zoom_level + goal_handle.request.ptz.zoom, self.min_zoom, self.max_zoom)
+
+        self.ptz_state.mode = PtzState.MODE_POSITION
+        reached_goal = self.wait_for_position(goal_handle, cmd_pan, cmd_tilt, cmd_zoom)
+        self.ptz_state.mode = PtzState.MODE_IDLE
+
+        result = PtzMove.Result()
+        result.success = reached_goal
+        if reached_goal:
+            goal_handle.succeed()
+
+        return result
+
+    def move_ptz_vel_cb(self, goal_handle):
+        """
+        Move the camera under velocity control, publishing feedback
+
+        @param goal_handle
+        """
+        result = PtzMove.Result()
+        result.success = True
+
+        fb = PtzMove.Feedback()
+        fb.ptz_remaining.pan = goal_handle.request.ptz.pan
+        fb.ptz_remaining.tilt = goal_handle.request.ptz.tilt
+        fb.ptz_remaining.zoom = goal_handle.request.ptz.zoom
+
+        self.ptz_state.mode = PtzState.MODE_VELOCITY
+        cmd = Ptz()
+        cmd.pan = goal_handle.request.ptz.pan
+        cmd.tilt = goal_handle.request.ptz.tilt
+        cmd.zoom = goal_handle.request.ptz.zoom
+
+        # send the velocity command to the topic subscriber to get the camera moving
+        self.cmd_velocity_cb(cmd)
+
+        # Continuous control; the only way to stop is to cancel
+        rate = self.create_rate(1)
+        while not goal_handle.is_cancel_requested and goal_handle.is_active:
+            rate.sleep()
+            goal_handle.publish_feedback(fb)
+
+        # Command the camera to stop moving
+        self.ptz_state.mode = PtzState.MODE_IDLE
+        self.get_logger().info('Cancelling velocity action')
+        cmd.pan = 0
+        cmd.tilt = 0
+        cmd.zoom = 0
+        self.cmd_velocity_cb(cmd)
+        goal_handle.abort()
+        return result
+
+    def cancel_ptz_abs_cb(self, cancel_request):
+        return CancelResponse.ACCEPT
+
+    def cancel_ptz_rel_cb(self, cancel_request):
+        return CancelResponse.ACCEPT
+
+    def cancel_ptz_vel_cb(self, cancel_request):
+        return CancelResponse.ACCEPT
+
+    def wait_for_position(self, goal_handle, cmd_pan, cmd_tilt, cmd_zoom):
+        # Send a slow velocity command to the camera
+        def direction(goal, current):
+            if goal == current:
+                return 0
+            if goal < current:
+                return -1
+            return 1
+        cmd = Ptz()
+        cmd.pan = 0.17453292519943295 * direction(cmd_pan, self.pan_position)  # 10 deg/s
+        cmd.tilt = 0.17453292519943295 * direction(cmd_tilt, self.tilt_position)
+        cmd.zoom = 0.1 * direction(cmd_zoom, self.zoom_level)
+        self.cmd_velocity_cb(cmd)
+
+        # Wait until we reach the desired position or reach the limit of travel
+        rate = self.create_rate(10)
+        fb = PtzMove.Feedback()
+        reached_goal = False
+        position_slop = 0.017453292519943295  # +/- 1 degree
+        zoom_slop = 0.1                       # +/- 0.1x
+        while (
+            goal_handle and not reached_goal and
+            not goal_handle.is_cancel_requested and
+            goal_handle.is_active
+        ):
+            rate.sleep()
+
+            # see if we've reached any of our goals yet
+            if abs(self.pan_position - cmd_pan) <= position_slop:
+                cmd.pan = 0
+            if abs(self.tilt_position - cmd_tilt) <= position_slop:
+                cmd.tilt = 0
+            if abs(self.zoom_level - cmd_zoom) <= zoom_slop:
+                cmd.zoom = 0
+
+            self.cmd_velocity_cb(cmd)
+
+            if cmd.zoom == 0 and cmd.tilt == 0 and cmd.pan == 0:
+                reached_goal = True
+            else:
+                fb.ptz_remaining.pan = float(abs(cmd_pan - self.pan_position))
+                fb.ptz_remaining.tilt = float(abs(cmd_tilt - self.tilt_position))
+                fb.ptz_remaining.zoom = float(abs(cmd_zoom - self.zoom_level))
+
+                goal_handle.publish_feedback(fb)
+
+        if not goal_handle.is_active:
+            return False
+        if goal_handle.is_cancel_requested:
+            goal_handle.abort()
+            return False
+        return True
+
+
+def main():
+    rclpy.init()
+    executor = MultiThreadedExecutor()
+    node = PtzControlNode()
+    rclpy.spin(node, executor=executor)
+    node.destroy_node()
+    rclpy.shutdown()
+
+if __name__ == '__main__':
+    main()

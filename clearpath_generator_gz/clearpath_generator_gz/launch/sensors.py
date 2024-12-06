@@ -106,7 +106,10 @@ class SensorLaunch():
         self.extra_gz_nodes = []
 
         # Cameras
-        if self.sensor.SENSOR_TYPE == BaseCamera.SENSOR_TYPE:
+        if (
+            self.sensor.SENSOR_TYPE == BaseCamera.SENSOR_TYPE and
+            self.sensor.SENSOR_MODEL not in self.PTZ_CAMERAS
+        ):
             image_ns = '/' + self.namespace + self.name
             image_topic = image_ns + '/image'
 
@@ -151,6 +154,27 @@ class SensorLaunch():
             self.extra_gz_nodes.append(depth_bridge_node)
 
         if self.sensor.SENSOR_MODEL in self.PTZ_CAMERAS:
+            image_ns = '/' + self.namespace + self.name
+            image_topic = image_ns + '/image'
+
+            image_bridge_node = LaunchFile.Node(
+                name=self.name + '_gz_image_bridge',
+                namespace=self.namespace,
+                package='ros_gz_image',
+                executable='image_bridge',
+                parameters=[{
+                    'use_sim_time': True,
+                }],
+                arguments=[image_topic],
+                remappings=[
+                    (image_topic, image_ns + '/_/image_raw'),
+                    (image_topic + '/compressed', image_ns + '/_/compressed'),
+                    (image_topic + '/compressedDepth', image_ns + '/_/compressedDepth'),
+                    (image_topic + '/theora', image_ns + '/_/theora'),
+                ]
+            )
+            self.extra_gz_nodes.append(image_bridge_node)
+
             cmd_ns = '/' + self.namespace + self.name
             cmd_bridge_node = LaunchFile.Node(
                 name=self.name + '_gz_cmd_bridge',
@@ -166,10 +190,32 @@ class SensorLaunch():
                 ],
                 remappings=[
                     (cmd_ns + '/pan_joint_state', '/' + self._robot_namespace + '/platform/joint_states'),
-                    (cmd_ns + '/tilt_joint_state', '/' + self._robot_namespace + '/platform/joint_states')
+                    (cmd_ns + '/tilt_joint_state', '/' + self._robot_namespace + '/platform/joint_states'),
+                    (cmd_ns + '/cmd_pan_vel', cmd_ns + '/_/cmd_pan_vel'),
+                    (cmd_ns + '/cmd_tilt_vel', cmd_ns + '/_/cmd_tilt_vel'),
                 ],
             )
             self.extra_gz_nodes.append(cmd_bridge_node)
+
+            ptz_node = LaunchFile.Node(
+                name='ptz_action_server_node',
+                namespace=image_ns,
+                package='clearpath_generator_gz',
+                executable='ptz_controller_node',
+                parameters=[
+                    {'use_sim_time': True},
+                    {'camera_name': self.name},
+                ],
+                remappings=[
+                    ('image_in', image_ns + '/_/image_raw'),
+                    ('image_out', image_ns + '/color/image'),
+                    ('cmd/velocity', image_ns + '/cmd/velocity'),
+                    ('joint_states', '/' + self._robot_namespace + '/platform/joint_states'),
+                    ('cmd_pan_vel', cmd_ns + '/_/cmd_pan_vel'),
+                    ('cmd_tilt_vel', cmd_ns + '/_/cmd_tilt_vel'),
+                ],
+            )
+            self.extra_gz_nodes.append(ptz_node)
 
     def generate(self):
         sensor_writer = LaunchWriter(self.launch_file)
