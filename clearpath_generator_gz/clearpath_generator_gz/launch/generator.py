@@ -149,66 +149,51 @@ class GzLaunchGenerator(LaunchGenerator):
           }]
         )
 
+        # Common components for all platforms
+        self.common_platform_components = [
+            self.cmd_vel_node,
+            self.odom_base_node
+        ]
+
         # Components required for each platform
-        self.platform_components = {
+        self.extra_platform_components = {
             Platform.J100: [
-                self.cmd_vel_node,
-                self.odom_base_node,
                 self.imu_0_bridge_node,
                 self.imu_filter_arg,
                 self.imu_filter_node,
                 self.gps_0_bridge_node,
             ],
             Platform.A200: [
-                self.cmd_vel_node,
-                self.odom_base_node,
             ],
-            Platform.A300: [
-                self.cmd_vel_node,
-                self.odom_base_node,
-            ],
+            Platform.A300: [            ],
             Platform.DD100: [
-                self.cmd_vel_node,
-                self.odom_base_node,
                 self.imu_0_bridge_node,
                 self.imu_filter_arg,
                 self.imu_filter_node,
             ],
             Platform.DD150: [
-                self.cmd_vel_node,
-                self.odom_base_node,
                 self.imu_0_bridge_node,
                 self.imu_filter_arg,
                 self.imu_filter_node,
             ],
             Platform.DO100: [
-                self.cmd_vel_node,
-                self.odom_base_node,
                 self.imu_0_bridge_node,
                 self.imu_filter_arg,
                 self.imu_filter_node,
             ],
             Platform.DO150: [
-                self.cmd_vel_node,
-                self.odom_base_node,
                 self.imu_0_bridge_node,
                 self.imu_filter_arg,
                 self.imu_filter_node,
             ],
             Platform.GENERIC: [
-                self.cmd_vel_node,
-                self.odom_base_node,
             ],
             Platform.R100: [
-                self.cmd_vel_node,
-                self.odom_base_node,
                 self.imu_0_bridge_node,
                 self.imu_filter_arg,
                 self.imu_filter_node,
             ],
             Platform.W200: [
-                self.cmd_vel_node,
-                self.odom_base_node,
                 self.imu_0_bridge_node,
                 self.imu_filter_arg,
                 self.imu_filter_node,
@@ -237,7 +222,9 @@ class GzLaunchGenerator(LaunchGenerator):
         platform_service_launch_writer.add_launch_file(self.platform_launch_file)
 
         # Platform components
-        for component in self.platform_components[self.platform_model]:
+        for component in self.common_platform_components:
+            platform_service_launch_writer.add(component)
+        for component in self.extra_platform_components[self.platform_model]:
             platform_service_launch_writer.add(component)
 
         platform_service_launch_writer.generate_file()
