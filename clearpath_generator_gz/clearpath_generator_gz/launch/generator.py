@@ -156,44 +156,42 @@ class GzLaunchGenerator(LaunchGenerator):
         ]
 
         # Components required for each platform
-        self.extra_platform_components = {
-            Platform.J100: [
+        self.platform_components = {
+            Platform.J100: self.common_platform_components + [
                 self.imu_0_bridge_node,
                 self.imu_filter_arg,
                 self.imu_filter_node,
                 self.gps_0_bridge_node,
             ],
-            Platform.A200: [
-            ],
-            Platform.A300: [            ],
-            Platform.DD100: [
+            Platform.A200: self.common_platform_components,
+            Platform.A300: self.common_platform_components,
+            Platform.DD100: self.common_platform_components + [
                 self.imu_0_bridge_node,
                 self.imu_filter_arg,
                 self.imu_filter_node,
             ],
-            Platform.DD150: [
+            Platform.DD150:  self.common_platform_components + [
+                self.imu_0_bidge_node,
+                self.imu_filter_arg,
+                self.imu_filter_node,
+            ],
+            Platform.DO100: self.common_platform_components + [
                 self.imu_0_bridge_node,
                 self.imu_filter_arg,
                 self.imu_filter_node,
             ],
-            Platform.DO100: [
+            Platform.DO150: self.common_platform_components + [
                 self.imu_0_bridge_node,
                 self.imu_filter_arg,
                 self.imu_filter_node,
             ],
-            Platform.DO150: [
+            Platform.GENERIC: self.common_platform_components,
+            Platform.R100: self.common_platform_components + [
                 self.imu_0_bridge_node,
                 self.imu_filter_arg,
                 self.imu_filter_node,
             ],
-            Platform.GENERIC: [
-            ],
-            Platform.R100: [
-                self.imu_0_bridge_node,
-                self.imu_filter_arg,
-                self.imu_filter_node,
-            ],
-            Platform.W200: [
+            Platform.W200: self.common_platform_components + [
                 self.imu_0_bridge_node,
                 self.imu_filter_arg,
                 self.imu_filter_node,
@@ -222,9 +220,7 @@ class GzLaunchGenerator(LaunchGenerator):
         platform_service_launch_writer.add_launch_file(self.platform_launch_file)
 
         # Platform components
-        for component in self.common_platform_components:
-            platform_service_launch_writer.add(component)
-        for component in self.extra_platform_components[self.platform_model]:
+        for component in self.latform_components[self.platform_model]:
             platform_service_launch_writer.add(component)
 
         platform_service_launch_writer.generate_file()
