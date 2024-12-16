@@ -182,15 +182,15 @@ class SensorLaunch():
                 package='ros_gz_bridge',
                 executable='parameter_bridge',
                 parameters=[{'use_sim_time': True}],
-                arguments = [
+                arguments=[
                     cmd_ns + '/cmd_pan_vel' + self.ROS_TO_GZ_FLOAT,
                     cmd_ns + '/cmd_tilt_vel' + self.ROS_TO_GZ_FLOAT,
                     cmd_ns + '/pan_joint_state' + self.GZ_TO_ROS_JOINTSTATE,
                     cmd_ns + '/tilt_joint_state' + self.GZ_TO_ROS_JOINTSTATE,
                 ],
                 remappings=[
-                    (cmd_ns + '/pan_joint_state', '/' + self._robot_namespace + '/platform/joint_states'),
-                    (cmd_ns + '/tilt_joint_state', '/' + self._robot_namespace + '/platform/joint_states'),
+                    (cmd_ns + '/pan_joint_state', '/' + self._robot_namespace + '/platform/joint_states'),  # noqa:E501
+                    (cmd_ns + '/tilt_joint_state', '/' + self._robot_namespace + '/platform/joint_states'),  # noqa:E501
                     (cmd_ns + '/cmd_pan_vel', cmd_ns + '/_/cmd_pan_vel'),
                     (cmd_ns + '/cmd_tilt_vel', cmd_ns + '/_/cmd_tilt_vel'),
                 ],
