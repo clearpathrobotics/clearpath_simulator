@@ -220,7 +220,7 @@ class GzLaunchGenerator(LaunchGenerator):
         platform_service_launch_writer.add_launch_file(self.platform_launch_file)
 
         # Platform components
-        for component in self.latform_components[self.platform_model]:
+        for component in self.platform_components[self.platform_model]:
             platform_service_launch_writer.add(component)
 
         platform_service_launch_writer.generate_file()
