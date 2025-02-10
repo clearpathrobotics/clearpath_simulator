@@ -243,4 +243,15 @@ class GzLaunchGenerator(LaunchGenerator):
 
     def generate_manipulators(self) -> None:
         manipulators_service_launch_writer = LaunchWriter(self.manipulators_service_launch_file)
+        if self.clearpath_config.manipulators.get_all_manipulators():
+            if self.clearpath_config.manipulators.moveit.enable:
+                manipulators_service_launch_writer.add(LaunchFile(
+                    name='moveit',
+                    package=self.pkg_clearpath_manipulators,
+                    args=[
+                        ('setup_path', self.setup_path),
+                        ('use_sim_time', 'true'),
+                        ('namespace', self.namespace)
+                    ]
+                ))
         manipulators_service_launch_writer.generate_file()
