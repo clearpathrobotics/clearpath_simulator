@@ -50,7 +50,10 @@ ARGUMENTS = [
                           description='Gazebo World'),
     DeclareLaunchArgument('setup_path',
                           default_value=[EnvironmentVariable('HOME'), '/clearpath/'],
-                          description='Clearpath setup path')
+                          description='Clearpath setup path'),
+    DeclareLaunchArgument('disable_generators', default_value='false',
+                          choices=['true', 'false'],
+                          description='Disable running generators on startup.'),
 ]
 
 for pose_element in ['x', 'y', 'yaw']:
@@ -67,6 +70,7 @@ def launch_setup(context, *args, **kwargs):
     use_sim_time = LaunchConfiguration('use_sim_time')
     x, y, z = LaunchConfiguration('x'), LaunchConfiguration('y'), LaunchConfiguration('z')
     yaw = LaunchConfiguration('yaw')
+    disable_generators_value = LaunchConfiguration('disable_generators').perform(context)
 
     # Parse robot YAML into config
     clearpath_config = ClearpathConfig(os.path.join(
@@ -187,14 +191,17 @@ def launch_setup(context, *args, **kwargs):
         condition=IfCondition(LaunchConfiguration('rviz')),
     )
 
-    return [
-        node_generate_description,
-        event_generate_description,
-        event_generate_semantic_description,
-        event_generate_launch,
-        event_generate_param,
-        rviz
-    ]
+    if disable_generators_value.lower() == 'true':
+        return [group_action_spawn_robot, rviz]
+    else:
+        return [
+            node_generate_description,
+            event_generate_description,
+            event_generate_semantic_description,
+            event_generate_launch,
+            event_generate_param,
+            rviz
+        ]
 
 
 def generate_launch_description():
