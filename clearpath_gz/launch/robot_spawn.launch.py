@@ -50,7 +50,11 @@ ARGUMENTS = [
                           description='Gazebo World'),
     DeclareLaunchArgument('setup_path',
                           default_value=[EnvironmentVariable('HOME'), '/clearpath/'],
-                          description='Clearpath setup path')
+                          description='Clearpath setup path'),
+    DeclareLaunchArgument('generate',
+                          default_value='true',
+                          choices=['true', 'false'],
+                          description='Generate parameters and launch files')
 ]
 
 for pose_element in ['x', 'y', 'yaw']:
@@ -67,6 +71,7 @@ def launch_setup(context, *args, **kwargs):
     use_sim_time = LaunchConfiguration('use_sim_time')
     x, y, z = LaunchConfiguration('x'), LaunchConfiguration('y'), LaunchConfiguration('z')
     yaw = LaunchConfiguration('yaw')
+    generate = LaunchConfiguration('generate')
 
     # Parse robot YAML into config
     clearpath_config = ClearpathConfig(os.path.join(
@@ -129,6 +134,7 @@ def launch_setup(context, *args, **kwargs):
         executable='generate_description',
         name='generate_description',
         output='screen',
+        condition=IfCondition(generate),
         arguments=['-s', setup_path]
     )
 
@@ -137,6 +143,7 @@ def launch_setup(context, *args, **kwargs):
         executable='generate_semantic_description',
         name='generate_semantic_description',
         output='screen',
+        condition=IfCondition(generate),
         arguments=['-s', setup_path]
     )
 
@@ -145,6 +152,7 @@ def launch_setup(context, *args, **kwargs):
         executable='generate_launch',
         name='generate_launch',
         output='screen',
+        condition=IfCondition(generate),
         arguments=['-s', setup_path]
     )
 
@@ -153,6 +161,7 @@ def launch_setup(context, *args, **kwargs):
         executable='generate_param',
         name='generate_launch',
         output='screen',
+        condition=IfCondition(generate),
         arguments=['-s', setup_path]
     )
 
@@ -193,7 +202,7 @@ def launch_setup(context, *args, **kwargs):
         condition=IfCondition(LaunchConfiguration('rviz')),
     )
 
-    return [
+    actions = [
         node_generate_description,
         event_generate_description,
         event_generate_semantic_description,
@@ -201,6 +210,11 @@ def launch_setup(context, *args, **kwargs):
         event_generate_param,
         rviz
     ]
+
+    if generate.perform(context):
+        actions.append(group_action_spawn_robot)
+
+    return actions
 
 
 def generate_launch_description():
