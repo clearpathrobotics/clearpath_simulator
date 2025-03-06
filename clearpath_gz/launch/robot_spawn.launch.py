@@ -211,7 +211,7 @@ def launch_setup(context, *args, **kwargs):
         rviz
     ]
 
-    if generate.perform(context):
+    if not generate.perform(context):
         actions.append(group_action_spawn_robot)
 
     return actions
