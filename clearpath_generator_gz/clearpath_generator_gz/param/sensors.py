@@ -38,6 +38,7 @@ from clearpath_config.sensors.types.cameras import (
     BaseCamera,
     FlirBlackfly,
     IntelRealsense,
+    LuxonisOAKD,
     StereolabsZed,
 )
 from clearpath_config.sensors.types.gps import (
@@ -301,6 +302,7 @@ class SensorParam():
         FlirBlackfly.SENSOR_MODEL: CameraParam,
 
         IntelRealsense.SENSOR_MODEL: RGBDCameraParam,
+        LuxonisOAKD.SENSOR_MODEL: RGBDCameraParam,
         StereolabsZed.SENSOR_MODEL: RGBDCameraParam,
 
         BaseIMU.SENSOR_MODEL: ImuParam,
