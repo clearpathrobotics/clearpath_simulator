@@ -34,6 +34,7 @@ import os
 
 from clearpath_config.common.utils.yaml import write_yaml
 from clearpath_config.sensors.types.cameras import (
+    AxisCamera,
     BaseCamera,
     FlirBlackfly,
     IntelRealsense,
@@ -296,6 +297,7 @@ class SensorParam():
         OusterOS1.SENSOR_MODEL: Lidar3dParam,
         SeyondLidar.SENSOR_MODEL: Lidar3dParam,
 
+        AxisCamera.SENSOR_MODEL: CameraParam,
         FlirBlackfly.SENSOR_MODEL: CameraParam,
 
         IntelRealsense.SENSOR_MODEL: RGBDCameraParam,
