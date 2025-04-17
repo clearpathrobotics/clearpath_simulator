@@ -46,9 +46,24 @@ from clearpath_config.sensors.types.gps import (
     NovatelSmart7,
     SwiftNavDuro,
 )
-from clearpath_config.sensors.types.imu import BaseIMU, CHRoboticsUM6, Microstrain, RedshiftUM7
-from clearpath_config.sensors.types.lidars_2d import BaseLidar2D, HokuyoUST, SickLMS1XX
-from clearpath_config.sensors.types.lidars_3d import BaseLidar3D, VelodyneLidar
+from clearpath_config.sensors.types.imu import (
+    BaseIMU,
+    CHRoboticsUM6,
+    Microstrain,
+    PhidgetsSpatial,
+    RedshiftUM7,
+)
+from clearpath_config.sensors.types.lidars_2d import (
+    BaseLidar2D,
+    HokuyoUST,
+    SickLMS1XX
+)
+from clearpath_config.sensors.types.lidars_3d import (
+    BaseLidar3D,
+    OusterOS1,
+    SeyondLidar,
+    VelodyneLidar
+)
 from clearpath_config.sensors.types.sensor import BaseSensor
 
 
@@ -276,14 +291,22 @@ class SensorParam():
     MODEL = {
         HokuyoUST.SENSOR_MODEL: Lidar2dParam,
         SickLMS1XX.SENSOR_MODEL: Lidar2dParam,
+
+        VelodyneLidar.SENSOR_MODEL: Lidar3dParam,
+        OusterOS1.SENSOR_MODEL: Lidar3dParam,
+        SeyondLidar.SENSOR_MODEL: Lidar3dParam,
+
         FlirBlackfly.SENSOR_MODEL: CameraParam,
+
         IntelRealsense.SENSOR_MODEL: RGBDCameraParam,
         StereolabsZed.SENSOR_MODEL: RGBDCameraParam,
+
         BaseIMU.SENSOR_MODEL: ImuParam,
         CHRoboticsUM6.SENSOR_MODEL: ImuParam,
         Microstrain.SENSOR_MODEL: ImuParam,
         RedshiftUM7.SENSOR_MODEL: ImuParam,
-        VelodyneLidar.SENSOR_MODEL: Lidar3dParam,
+        PhidgetsSpatial.SENSOR_MODEL: ImuParam,
+
         Garmin18x.SENSOR_MODEL: GPSParam,
         NovatelSmart6.SENSOR_MODEL: GPSParam,
         NovatelSmart7.SENSOR_MODEL: GPSParam,
