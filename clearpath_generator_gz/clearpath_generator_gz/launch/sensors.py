@@ -34,7 +34,7 @@ from clearpath_config.sensors.types.cameras import (
     AxisCamera,
     BaseCamera,
     IntelRealsense,
-    StereolabsZed
+    StereolabsZed,
 )
 from clearpath_config.sensors.types.sensor import BaseSensor
 from clearpath_generator_common.common import LaunchFile, ParamFile
@@ -216,6 +216,7 @@ class SensorLaunch():
                 ],
             )
             self.extra_gz_nodes.append(ptz_node)
+
 
     def generate(self):
         sensor_writer = LaunchWriter(self.launch_file)

@@ -55,6 +55,10 @@ from clearpath_config.sensors.types.imu import (
     PhidgetsSpatial,
     RedshiftUM7,
 )
+from clearpath_config.sensors.types.ins import (
+    BaseINS,
+    Fixposition,
+)
 from clearpath_config.sensors.types.lidars_2d import (
     BaseLidar2D,
     HokuyoUST,
@@ -64,7 +68,7 @@ from clearpath_config.sensors.types.lidars_3d import (
     BaseLidar3D,
     OusterOS1,
     SeyondLidar,
-    VelodyneLidar
+    VelodyneLidar,
 )
 from clearpath_config.sensors.types.sensor import BaseSensor
 
@@ -76,6 +80,7 @@ class MessageType():
         IMU = 'sensor_msgs/msg/Imu'
         LASER_SCAN = 'sensor_msgs/msg/LaserScan'
         NAVSAT = 'sensor_msgs/msg/NavSatFix'
+        ODOM = 'nav_msgs/msg/Odometry'
         POINT_CLOUD = 'sensor_msgs/msg/PointCloud2'
 
     class GZ():
@@ -84,6 +89,7 @@ class MessageType():
         IMU = 'gz.msgs.IMU'
         LASER_SCAN = 'gz.msgs.LaserScan'
         NAVSAT = 'gz.msgs.NavSat'
+        ODOM = 'gz.msgs.Odometry'
         POINT_CLOUD = 'gz.msgs.PointCloudPacked'
 
 
@@ -290,6 +296,37 @@ class SensorParam():
                 gz_type=MessageType.GZ.NAVSAT,
             )
 
+    class INSParam(BaseParam):
+        def __init__(
+            self,
+            sensor: BaseINS,
+            namespace: str,
+            param_path: str,
+            namespace_prefix: str = None,
+        ) -> None:
+            super().__init__(sensor, namespace, param_path, namespace_prefix)
+
+            for i in range(len(sensor.antennas)):
+                self.param_file.add(
+                    ros_topic=self.get_ros_topic(f'gps_{i}/fix'),
+                    gz_topic=self.get_gz_topic(f'gps_{i}/fix'),
+                    ros_type=MessageType.ROS.NAVSAT,
+                    gz_type=MessageType.GZ.NAVSAT,
+                )
+            self.param_file.add(
+                ros_topic=self.get_ros_topic('imu_0/data'),
+                gz_topic=self.get_gz_topic('imu_0/data'),
+                ros_type=MessageType.ROS.IMU,
+                gz_type=MessageType.GZ.IMU,
+            )
+            self.param_file.add(
+                ros_topic=self.get_ros_topic('odom'),
+                gz_topic=self.get_gz_topic('odom'),
+                ros_type=MessageType.ROS.ODOM,
+                gz_type=MessageType.GZ.ODOM,
+            )
+
+
     MODEL = {
         HokuyoUST.SENSOR_MODEL: Lidar2dParam,
         SickLMS1XX.SENSOR_MODEL: Lidar2dParam,
@@ -315,6 +352,8 @@ class SensorParam():
         NovatelSmart6.SENSOR_MODEL: GPSParam,
         NovatelSmart7.SENSOR_MODEL: GPSParam,
         SwiftNavDuro.SENSOR_MODEL: GPSParam,
+
+        Fixposition.SENSOR_MODEL: INSParam,
     }
 
     def __new__(cls,
