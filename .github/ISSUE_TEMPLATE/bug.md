@@ -11,7 +11,7 @@ assignees: clearpathrobotics/clearpath-platform-team
  - OS: (e.g. Ubuntu 22.04)
  - ROS 2 Distro: (e.g. Humble)
  - Built from source or installed:
- - Package version: (if from repository, give version from `sudo dpkg -s ros-$ROS_VERSION-clearpath-simulator`, if from source, give commit hash)
+ - Package version: (if from repository, give version from `sudo dpkg -s ros-$ROS_DISTRO-clearpath-simulator`, if from source, give commit hash)
 
  **Expected behaviour**
  A clear and concise description of what you expected to happen.
@@ -27,4 +27,4 @@ Provide the steps to reproduce:
 
 
 **Other notes**
-Add anything else you thing is important.
+Add anything else you think is important.
