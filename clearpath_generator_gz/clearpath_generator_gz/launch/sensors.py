@@ -217,7 +217,6 @@ class SensorLaunch():
             )
             self.extra_gz_nodes.append(ptz_node)
 
-
     def generate(self):
         sensor_writer = LaunchWriter(self.launch_file)
         # Add sensor bridge and tf nodes

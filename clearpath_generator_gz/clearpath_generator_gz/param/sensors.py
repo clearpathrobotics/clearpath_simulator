@@ -326,7 +326,6 @@ class SensorParam():
                 gz_type=MessageType.GZ.ODOM,
             )
 
-
     MODEL = {
         HokuyoUST.SENSOR_MODEL: Lidar2dParam,
         SickLMS1XX.SENSOR_MODEL: Lidar2dParam,
