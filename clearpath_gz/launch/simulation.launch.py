@@ -34,6 +34,10 @@ ARGUMENTS = [
     DeclareLaunchArgument('use_sim_time', default_value='true',
                           choices=['true', 'false'],
                           description='use_sim_time'),
+    DeclareLaunchArgument('generate',
+                      default_value='true',
+                      choices=['true', 'false'],
+                      description='Generate parameters and launch files'),
 ]
 
 for pose_element in ['x', 'y', 'yaw']:
@@ -72,7 +76,8 @@ def generate_launch_description():
             ('x', LaunchConfiguration('x')),
             ('y', LaunchConfiguration('y')),
             ('z', LaunchConfiguration('z')),
-            ('yaw', LaunchConfiguration('yaw'))]
+            ('yaw', LaunchConfiguration('yaw')),
+            ('generate', LaunchConfiguration('generate'))]
     )
 
     # Create launch description and add actions
