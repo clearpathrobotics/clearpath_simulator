@@ -48,7 +48,7 @@ from clearpath_config.sensors.types.gps import (
 )
 from clearpath_config.sensors.types.imu import BaseIMU, CHRoboticsUM6, Microstrain, RedshiftUM7
 from clearpath_config.sensors.types.lidars_2d import BaseLidar2D, HokuyoUST, SickLMS1XX
-from clearpath_config.sensors.types.lidars_3d import BaseLidar3D, VelodyneLidar
+from clearpath_config.sensors.types.lidars_3d import BaseLidar3D, VelodyneLidar, OusterOS1
 from clearpath_config.sensors.types.sensor import BaseSensor
 
 
@@ -284,6 +284,7 @@ class SensorParam():
         Microstrain.SENSOR_MODEL: ImuParam,
         RedshiftUM7.SENSOR_MODEL: ImuParam,
         VelodyneLidar.SENSOR_MODEL: Lidar3dParam,
+        OusterOS1.SENSOR_MODEL: Lidar3dParam,
         Garmin18x.SENSOR_MODEL: GPSParam,
         NovatelSmart6.SENSOR_MODEL: GPSParam,
         NovatelSmart7.SENSOR_MODEL: GPSParam,
