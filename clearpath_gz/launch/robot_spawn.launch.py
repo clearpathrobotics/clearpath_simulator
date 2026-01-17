@@ -153,7 +153,7 @@ def launch_setup(context, *args, **kwargs):
     node_generate_param = Node(
         package='clearpath_generator_gz',
         executable='generate_param',
-        name='generate_launch',
+        name='generate_param',
         output='screen',
         condition=IfCondition(generate),
         arguments=['-s', setup_path]
