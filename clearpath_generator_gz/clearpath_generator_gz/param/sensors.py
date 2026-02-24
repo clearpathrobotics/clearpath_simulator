@@ -32,15 +32,15 @@
 
 import os
 
+from clearpath_config.common.utils.yaml import write_yaml
 from clearpath_config.sensors.types.cameras import (BaseCamera, FlirBlackfly, IntelRealsense,
                                                     StereolabsZed)
-from clearpath_config.sensors.types.gps import (BaseGPS, SwiftNavDuro, Garmin18x, NovatelSmart6,
-                                                NovatelSmart7)
-from clearpath_config.sensors.types.imu import BaseIMU, Microstrain, CHRoboticsUM6, RedshiftUM7
+from clearpath_config.sensors.types.gps import (BaseGPS, Garmin18x, NovatelSmart6,
+                                                NovatelSmart7, SwiftNavDuro)
+from clearpath_config.sensors.types.imu import BaseIMU, CHRoboticsUM6, Microstrain, RedshiftUM7
 from clearpath_config.sensors.types.lidars_2d import BaseLidar2D, HokuyoUST, SickLMS1XX
 from clearpath_config.sensors.types.lidars_3d import BaseLidar3D, OusterOS1, VelodyneLidar
 from clearpath_config.sensors.types.sensor import BaseSensor
-from clearpath_config.common.utils.yaml import write_yaml
 
 
 class MessageType():
