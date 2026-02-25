@@ -35,9 +35,9 @@ ARGUMENTS = [
                           choices=['true', 'false'],
                           description='use_sim_time'),
     DeclareLaunchArgument('generate',
-                      default_value='true',
-                      choices=['true', 'false'],
-                      description='Generate parameters and launch files'),
+                          default_value='true',
+                          choices=['true', 'false'],
+                          description='Generate parameters and launch files'),
 ]
 
 for pose_element in ['x', 'y', 'yaw']:

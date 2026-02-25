@@ -14,6 +14,8 @@
 #
 # @author Roni Kreinin (rkreinin@clearpathrobotics.com)
 
+import os
+
 from clearpath_config.clearpath_config import ClearpathConfig
 
 from launch import LaunchDescription
@@ -21,8 +23,8 @@ from launch.actions import (
     DeclareLaunchArgument,
     GroupAction,
     IncludeLaunchDescription,
-    RegisterEventHandler,
-    OpaqueFunction
+    OpaqueFunction,
+    RegisterEventHandler
 )
 from launch.conditions import IfCondition, UnlessCondition
 from launch.event_handlers import OnProcessExit
@@ -35,8 +37,6 @@ from launch.substitutions import (
 
 from launch_ros.actions import Node
 from launch_ros.substitutions import FindPackageShare
-
-import os
 
 
 ARGUMENTS = [
@@ -213,7 +213,7 @@ def launch_setup(context, *args, **kwargs):
         ],
         condition=IfCondition(LaunchConfiguration('generate'))
     )
-    
+
     do_not_generate = GroupAction(actions=[group_action_spawn_robot],
                                   condition=UnlessCondition(LaunchConfiguration('generate')))
 

@@ -32,15 +32,15 @@
 # modification, is not permitted without the express permission
 # of Clearpath Robotics.
 
+import os
+
 from clearpath_config.common.types.platform import Platform
 
 from clearpath_generator_common.common import LaunchFile
-from clearpath_generator_common.launch.writer import LaunchWriter
 from clearpath_generator_common.launch.generator import LaunchGenerator
+from clearpath_generator_common.launch.writer import LaunchWriter
 
 from clearpath_generator_gz.launch.sensors import SensorLaunch
-
-import os
 
 
 class GzLaunchGenerator(LaunchGenerator):
