@@ -50,6 +50,7 @@ PLATFORMS = {
     Platform.DO150: {'imu': True, 'gps': False},
     Platform.R100: {'imu': True, 'gps': False},
     Platform.W200: {'imu': True, 'gps': False},
+    Platform.GENERIC: {'imu': False, 'gps': False},
 }
 
 
