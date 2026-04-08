@@ -80,6 +80,7 @@ jobs:
           vcs-repo-file-url: updated_dependencies.repos
 
   clearpath_simulator_src_base_ci:
+    if: github.event_name == 'pull_request'
     name: Jazzy Clearpath Source with Base Branch
     runs-on: ubuntu-latest
     container:
