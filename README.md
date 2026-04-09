@@ -58,6 +58,18 @@ Available worlds are:
 | `solar_farm`          | An outdoor, agricultural environmentf featuring gentle hills, a barn, rows of solar panels, and fences.                | [link](docs/solar_farm.md)   | Stonewall MB, Canada     |
 | `warehouse` (default) | A flat, indoor warehouse environment. Features shelves and people.                                                     | [link](docs/warehouse.md)    | Rio de Janeiro, Brazil   |
 
+## Generator Tests
+
+Changes to the generators in this repository (`clearpath_generator_gz`) may affect the
+generated output for launch files and parameter files. The
+[clearpath_generator_tests](https://github.com/clearpathrobotics/clearpath_generator_tests)
+repository versions the expected output and validates it through CI.
+
+Before merging, ensure a corresponding branch with the **same name** exists in
+`clearpath_generator_tests` with regenerated samples. See the
+[Development Workflow](https://github.com/clearpathrobotics/clearpath_generator_tests#development-workflow)
+section of `clearpath_generator_tests` for the full process.
+
 
 ## Creating Map Tiles
 
