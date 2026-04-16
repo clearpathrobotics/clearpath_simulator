@@ -34,7 +34,6 @@
 
 import os
 
-from clearpath_config.common.types.platform import Platform
 from clearpath_config.sensors.types.gps import Garmin18x
 from clearpath_config.sensors.types.imu import BaseIMU
 from clearpath_generator_common.param.generator import ParamGenerator
@@ -43,16 +42,16 @@ from clearpath_generator_common.param.platform import PlatformParam
 from clearpath_generator_gz.param.sensors import SensorParam
 
 PLATFORMS = {
-    Platform.A200: {'imu': False, 'gps': False},
-    Platform.A300: {'imu': False, 'gps': False},
-    Platform.J100: {'imu': True, 'gps': True},
-    Platform.DD100: {'imu': True, 'gps': False},
-    Platform.DD150: {'imu': True, 'gps': False},
-    Platform.DO100: {'imu': True, 'gps': False},
-    Platform.DO150: {'imu': True, 'gps': False},
-    Platform.R100: {'imu': True, 'gps': False},
-    Platform.W200: {'imu': True, 'gps': False},
-    Platform.GENERIC: {'imu': False, 'gps': False},
+    'a200': {'imu': False, 'gps': False},
+    'a300': {'imu': False, 'gps': False},
+    'j100': {'imu': True, 'gps': True},
+    'dd100': {'imu': True, 'gps': False},
+    'dd150': {'imu': True, 'gps': False},
+    'do100': {'imu': True, 'gps': False},
+    'do150': {'imu': True, 'gps': False},
+    'r100': {'imu': True, 'gps': False},
+    'w200': {'imu': True, 'gps': False},
+    'generic': {'imu': False, 'gps': False},
 }
 
 
