@@ -26,7 +26,7 @@ from launch.actions import (
     OpaqueFunction,
     RegisterEventHandler,
 )
-from launch.conditions import IfCondition
+from launch.conditions import IfCondition, UnlessCondition
 from launch.event_handlers import OnProcessExit
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import (
@@ -196,19 +196,20 @@ def launch_setup(context, *args, **kwargs):
         condition=IfCondition(LaunchConfiguration('rviz')),
     )
 
-    actions = [
+    do_not_generate = GroupAction(
+        actions=[group_action_spawn_robot],
+        condition=UnlessCondition(generate)
+    )
+
+    return [
         node_generate_description,
         event_generate_description,
         event_generate_semantic_description,
         event_generate_launch,
         event_generate_param,
-        rviz
+        rviz,
+        do_not_generate,
     ]
-
-    if not bool(generate.perform(context)):
-        actions.append(group_action_spawn_robot)
-
-    return actions
 
 
 def generate_launch_description():
