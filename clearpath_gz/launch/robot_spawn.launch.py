@@ -196,19 +196,24 @@ def launch_setup(context, *args, **kwargs):
         condition=IfCondition(LaunchConfiguration('rviz')),
     )
 
-    do_not_generate = GroupAction(
-        actions=[group_action_spawn_robot],
-        condition=UnlessCondition(generate)
+    do_generate = GroupAction(
+        actions=[
+            node_generate_description,
+            event_generate_description,
+            event_generate_semantic_description,
+            event_generate_launch,
+            event_generate_param,
+            rviz
+        ],
+        condition=IfCondition(LaunchConfiguration('generate'))
     )
 
+    do_not_generate = GroupAction(actions=[group_action_spawn_robot],
+                                  condition=UnlessCondition(LaunchConfiguration('generate')))
+
     return [
-        node_generate_description,
-        event_generate_description,
-        event_generate_semantic_description,
-        event_generate_launch,
-        event_generate_param,
-        rviz,
-        do_not_generate,
+        do_generate,
+        do_not_generate
     ]
 
 
