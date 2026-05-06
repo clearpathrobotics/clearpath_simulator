@@ -1,0 +1,97 @@
+#!/usr/bin/env python3
+# Software License Agreement (BSD)
+#
+# @author    Tony Baltovski <tbaltovski@clearpathrobotics.com>
+# @copyright (c) 2026, Rockwell Automation Technologies, Inc., All rights reserved.
+#
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are met:
+# * Redistributions of source code must retain the above copyright notice,
+#   this list of conditions and the following disclaimer.
+# * Redistributions in binary form must reproduce the above copyright notice,
+#   this list of conditions and the following disclaimer in the documentation
+#   and/or other materials provided with the distribution.
+# * Neither the name of Rockwell Automation Technologies nor the names of its contributors
+#   may be used to endorse or promote products derived from this software
+#   without specific prior written permission.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+# ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+# LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+# CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+# SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+# INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+# CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+# ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+# POSSIBILITY OF SUCH DAMAGE.
+"""
+Relays a sensor_msgs/JointState command on `cmd` (typically /ptu/cmd) into
+per-joint std_msgs/Float64 position commands on `cmd_pan` / `cmd_tilt`, which
+are bridged to the Gazebo JointPositionController plugins declared in the
+FLIR PTU xacro.
+
+Also re-publishes the bridged PTU joint state (`state`) into the platform
+joint state stream (`joint_states`) so that robot_state_publisher updates the
+PTU TF chain in sim. (On real hardware the driver publishes the joint state
+directly.)
+"""
+
+import rclpy
+from rclpy.node import Node
+from sensor_msgs.msg import JointState
+from std_msgs.msg import Float64
+
+
+class PtuSimRelay(Node):
+    def __init__(self):
+        super().__init__('ptu_sim_relay')
+        self.declare_parameter('pan_joint', 'ptu_pan')
+        self.declare_parameter('tilt_joint', 'ptu_tilt')
+        self.pan_joint = self.get_parameter('pan_joint').get_parameter_value().string_value
+        self.tilt_joint = self.get_parameter('tilt_joint').get_parameter_value().string_value
+
+        self.pan_pub = self.create_publisher(Float64, 'cmd_pan', 1)
+        self.tilt_pub = self.create_publisher(Float64, 'cmd_tilt', 1)
+        self.cmd_sub = self.create_subscription(JointState, 'cmd', self.on_cmd, 1)
+
+        # Re-publish bridged gz joint state into the platform joint_states stream
+        # so robot_state_publisher can drive the PTU TF chain.
+        self.joint_state_pub = self.create_publisher(JointState, 'joint_states', 10)
+        self.state_sub = self.create_subscription(
+            JointState, 'state', self.on_state, 10)
+
+    def on_cmd(self, msg: JointState):
+        for name, pos in zip(msg.name, msg.position):
+            if name == self.pan_joint:
+                self.pan_pub.publish(Float64(data=float(pos)))
+            elif name == self.tilt_joint:
+                self.tilt_pub.publish(Float64(data=float(pos)))
+
+    def on_state(self, msg: JointState):
+        if not msg.name:
+            return
+        out = JointState()
+        out.header.stamp = self.get_clock().now().to_msg()
+        out.name = list(msg.name)
+        out.position = list(msg.position)
+        out.velocity = list(msg.velocity)
+        out.effort = list(msg.effort)
+        self.joint_state_pub.publish(out)
+
+
+def main():
+    rclpy.init()
+    node = PtuSimRelay()
+    try:
+        rclpy.spin(node)
+    except KeyboardInterrupt:
+        pass
+    finally:
+        node.destroy_node()
+        rclpy.shutdown()
+
+
+if __name__ == '__main__':
+    main()
