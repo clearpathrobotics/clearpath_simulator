@@ -33,7 +33,6 @@
 # of Clearpath Robotics.
 import os
 
-from clearpath_config.common.types.platform import Platform
 from clearpath_generator_common.common import LaunchFile
 from clearpath_generator_common.launch.generator import LaunchGenerator
 from clearpath_generator_common.launch.writer import LaunchWriter
@@ -157,41 +156,41 @@ class GzLaunchGenerator(LaunchGenerator):
 
         # Components required for each platform
         self.platform_components = {
-            Platform.J100: self.common_platform_components + [
+            'j100': self.common_platform_components + [
                 self.imu_0_bridge_node,
                 self.imu_filter_arg,
                 self.imu_filter_node,
                 self.gps_0_bridge_node,
             ],
-            Platform.A200: self.common_platform_components,
-            Platform.A300: self.common_platform_components,
-            Platform.DD100: self.common_platform_components + [
+            'a200': self.common_platform_components,
+            'a300': self.common_platform_components,
+            'dd100': self.common_platform_components + [
                 self.imu_0_bridge_node,
                 self.imu_filter_arg,
                 self.imu_filter_node,
             ],
-            Platform.DD150:  self.common_platform_components + [
+            'dd150': self.common_platform_components + [
                 self.imu_0_bridge_node,
                 self.imu_filter_arg,
                 self.imu_filter_node,
             ],
-            Platform.DO100: self.common_platform_components + [
+            'do100': self.common_platform_components + [
                 self.imu_0_bridge_node,
                 self.imu_filter_arg,
                 self.imu_filter_node,
             ],
-            Platform.DO150: self.common_platform_components + [
+            'do150': self.common_platform_components + [
                 self.imu_0_bridge_node,
                 self.imu_filter_arg,
                 self.imu_filter_node,
             ],
-            Platform.GENERIC: self.common_platform_components,
-            Platform.R100: self.common_platform_components + [
+            'generic': self.common_platform_components,
+            'r100': self.common_platform_components + [
                 self.imu_0_bridge_node,
                 self.imu_filter_arg,
                 self.imu_filter_node,
             ],
-            Platform.W200: self.common_platform_components + [
+            'w200': self.common_platform_components + [
                 self.imu_0_bridge_node,
                 self.imu_filter_arg,
                 self.imu_filter_node,
