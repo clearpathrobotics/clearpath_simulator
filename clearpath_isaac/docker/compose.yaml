@@ -1,0 +1,63 @@
+services:
+  isaac-sim:
+    image: nvcr.io/nvidia/isaac-sim:5.1.0
+    container_name: isaac-sim
+    entrypoint: ./isaac-sim.sh
+    # Run as the host user so files written under /workspace land with the
+    # right ownership. The built-in `isaac-sim` user is uid/gid 1234 inside
+    # the image, and the read-only parts of /isaac-sim are mode 0750, so we
+    # also need to be a member of that group to traverse them.
+    user: "${UID:-1000}:${GID:-1000}"
+    group_add:
+      - "1234"
+    environment:
+      - HOME=/tmp
+      - ACCEPT_EULA=Y
+      - PRIVACY_CONSENT=Y
+      - OMNI_KIT_ALLOW_ROOT=1
+      - DISPLAY=${DISPLAY}
+      - XAUTHORITY=/tmp/.docker.xauth
+      - QT_X11_NO_MITSHM=1
+      - NVIDIA_DRIVER_CAPABILITIES=all
+      - NVIDIA_VISIBLE_DEVICES=all
+      - RMW_IMPLEMENTATION=rmw_fastrtps_cpp
+      - ROS_DOMAIN_ID=0
+      # rclpy + librmw from the bundled jazzy install in the bridge extension
+      - LD_LIBRARY_PATH=/isaac-sim/exts/isaacsim.ros2.bridge/jazzy/lib
+      - PYTHONPATH=/isaac-sim/exts/isaacsim.ros2.bridge/jazzy/rclpy
+      # Force UDP-only DDS: shared-memory transport doesn't cross the
+      # host <-> container /dev/shm boundary even with network_mode: host.
+      - FASTRTPS_DEFAULT_PROFILES_FILE=/workspace/docker/fastdds-udp.xml
+    network_mode: host
+    runtime: nvidia
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu, graphics, display, compute, utility]
+    volumes:
+      - /tmp/.X11-unix:/tmp/.X11-unix:rw
+      - /tmp/.docker.xauth:/tmp/.docker.xauth:rw
+      # Persistent caches (speed up subsequent launches). HOME=/tmp so Kit
+      # writes under /tmp/.cache, /tmp/.local etc.
+      - ~/docker/isaac-sim/cache/kit:/isaac-sim/kit/cache:rw
+      - ~/docker/isaac-sim/cache/ov:/tmp/.cache/ov:rw
+      - ~/docker/isaac-sim/cache/pip:/tmp/.cache/pip:rw
+      - ~/docker/isaac-sim/cache/glcache:/tmp/.cache/nvidia/GLCache:rw
+      - ~/docker/isaac-sim/cache/computecache:/tmp/.nv/ComputeCache:rw
+      - ~/docker/isaac-sim/logs:/tmp/.nvidia-omniverse/logs:rw
+      - ~/docker/isaac-sim/data:/tmp/.local/share/ov/data:rw
+      - ~/docker/isaac-sim/documents:/tmp/Documents:rw
+      # Mount the clearpath_isaac package as /workspace
+      - ../:/workspace:rw
+
+  ros2:
+    image: ros:jazzy
+    container_name: ros2-jazzy
+    network_mode: host
+    environment:
+      - RMW_IMPLEMENTATION=rmw_fastrtps_cpp
+      - ROS_DOMAIN_ID=0
+    command: bash -c "source /opt/ros/jazzy/setup.bash && tail -f /dev/null"
