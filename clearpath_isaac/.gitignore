@@ -1,0 +1,5 @@
+# Generated artifacts (recreated by scripts/generate_urdf.sh + import_a300.py)
+urdf/a300.urdf
+meshes/
+usd/
+sim.log
