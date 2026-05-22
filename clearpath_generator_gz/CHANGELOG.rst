@@ -2,6 +2,11 @@
 Changelog for package clearpath_generator_gz
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Feature: PTU (`#109 <https://github.com/clearpathrobotics/clearpath_simulator/issues/109>`_)
+* Contributors: Tony Baltovski
+
 2.9.1 (2026-04-21)
 ------------------
 * Feature: Generator Sample Tests (`#107 <https://github.com/clearpathrobotics/clearpath_simulator/issues/107>`_)

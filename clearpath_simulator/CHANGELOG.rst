@@ -2,6 +2,9 @@
 Changelog for package clearpath_simulator
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+
 2.9.1 (2026-04-21)
 ------------------
 
