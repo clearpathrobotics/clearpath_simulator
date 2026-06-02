@@ -31,20 +31,18 @@
 # Redistribution and use in source and binary forms, with or without
 # modification, is not permitted without the express permission
 # of Clearpath Robotics.
-import os
-
-from clearpath_generator_common.common import LaunchFile
 from clearpath_generator_common.launch.generator import LaunchGenerator
 from clearpath_generator_common.launch.writer import LaunchWriter
+from clearpath_generator_gz.launch import platforms  # noqa: F401
+from clearpath_generator_gz.launch.platform import PlatformLaunch
 from clearpath_generator_gz.launch.sensors import SensorLaunch
 
 
 class GzLaunchGenerator(LaunchGenerator):
-    GZ_TO_ROS_TWIST = '@geometry_msgs/msg/TwistStamped[gz.msgs.Twist'
-    ROS_TO_GZ_TWIST = '@geometry_msgs/msg/TwistStamped]gz.msgs.Twist'
-    GZ_TO_ROS_TF = '@tf2_msgs/msg/TFMessage[gz.msgs.Pose_V'
+    """Concrete launch generator that emits the Gazebo-side service launch files."""
 
     def __init__(self, setup_path: str = '/etc/clearpath/') -> None:
+        """Initialize the generator and force `use_sim_time` on the shared platform launch."""
         super().__init__(setup_path)
         for i, arg in enumerate(self.platform_launch_file.args):
             if arg[0] == 'use_sim_time':
@@ -57,145 +55,6 @@ class GzLaunchGenerator(LaunchGenerator):
             self.robot_name = 'robot'
         else:
             self.robot_name = self.namespace + '/robot'
-
-        # cmd_vel bridge
-        if self.namespace in ('', '/'):
-            cmd_vel_bridge_arg = '/cmd_vel' + self.GZ_TO_ROS_TWIST
-            cmd_vel_bridge_remap = ('/cmd_vel', 'cmd_vel')
-        else:
-            cmd_vel_bridge_arg = self.namespace + '/cmd_vel' + self.GZ_TO_ROS_TWIST
-            cmd_vel_bridge_remap = (self.namespace + '/cmd_vel', 'cmd_vel')
-
-        cmd_vel_robot_bridge_arg = '/model/' + self.robot_name + '/cmd_vel' + self.ROS_TO_GZ_TWIST
-        cmd_vel_robot_bridge_remap = (
-            '/model/' + self.robot_name + '/cmd_vel',
-            'platform/cmd_vel'
-          )
-
-        self.cmd_vel_node = LaunchFile.Node(
-            package='ros_gz_bridge',
-            executable='parameter_bridge',
-            name='cmd_vel_bridge',
-            namespace=self.namespace,
-            parameters=[{'use_sim_time': True}],
-            arguments=[
-                cmd_vel_bridge_arg,
-                cmd_vel_robot_bridge_arg
-            ],
-            remappings=[
-                cmd_vel_bridge_remap,
-                cmd_vel_robot_bridge_remap
-            ])
-
-        # odom to base_link tf bridge
-        self.odom_base_node = LaunchFile.Node(
-            package='ros_gz_bridge',
-            executable='parameter_bridge',
-            name='odom_base_tf_bridge',
-            namespace=self.namespace,
-            parameters=[{'use_sim_time': True}],
-            arguments=[
-                '/model/' + self.robot_name + '/tf' + self.GZ_TO_ROS_TF
-            ],
-            remappings=[
-                ('/model/' + self.robot_name + '/tf', 'tf')
-            ])
-
-        # Builtin IMU bridge
-        self.imu_0_bridge_node = LaunchFile.Node(
-          name='imu_0_gz_bridge',
-          package='ros_gz_bridge',
-          executable='parameter_bridge',
-          namespace=self.namespace,
-          parameters=[{
-              'use_sim_time': True,
-              'config_file': os.path.join(
-                  self.sensors_params_path, 'imu_0.yaml')
-          }]
-        )
-
-        # IMU filter
-        self.imu_filter_arg = LaunchFile.LaunchArg(
-            'imu_filter',
-            default_value=os.path.join(self.platform_params_path, 'imu_filter.yaml')
-        )
-        imu_filter_variable = LaunchFile.Variable('imu_filter')
-
-        self.imu_filter_node = LaunchFile.Node(
-            package='imu_filter_madgwick',
-            executable='imu_filter_madgwick_node',
-            name='imu_filter_node',
-            namespace=self.namespace,
-            parameters=[imu_filter_variable],
-            remappings=[
-              ('imu/data_raw', 'sensors/imu_0/data_raw'),
-              ('imu/mag', 'sensors/imu_0/magnetic_field'),
-              ('imu/data', 'sensors/imu_0/data'),
-              ('/tf', 'tf'),
-            ],
-        )
-
-        # GPS bridge
-        self.gps_0_bridge_node = LaunchFile.Node(
-          name='gps_0_gz_bridge',
-          package='ros_gz_bridge',
-          executable='parameter_bridge',
-          namespace=self.namespace,
-          parameters=[{
-              'use_sim_time': True,
-              'config_file': os.path.join(
-                  self.sensors_params_path, 'gps_0.yaml')
-          }]
-        )
-
-        # Common components for all platforms
-        self.common_platform_components = [
-            self.cmd_vel_node,
-            self.odom_base_node
-        ]
-
-        # Components required for each platform
-        self.platform_components = {
-            'j100': self.common_platform_components + [
-                self.imu_0_bridge_node,
-                self.imu_filter_arg,
-                self.imu_filter_node,
-                self.gps_0_bridge_node,
-            ],
-            'a200': self.common_platform_components,
-            'a300': self.common_platform_components,
-            'dd100': self.common_platform_components + [
-                self.imu_0_bridge_node,
-                self.imu_filter_arg,
-                self.imu_filter_node,
-            ],
-            'dd150': self.common_platform_components + [
-                self.imu_0_bridge_node,
-                self.imu_filter_arg,
-                self.imu_filter_node,
-            ],
-            'do100': self.common_platform_components + [
-                self.imu_0_bridge_node,
-                self.imu_filter_arg,
-                self.imu_filter_node,
-            ],
-            'do150': self.common_platform_components + [
-                self.imu_0_bridge_node,
-                self.imu_filter_arg,
-                self.imu_filter_node,
-            ],
-            'generic': self.common_platform_components,
-            'r100': self.common_platform_components + [
-                self.imu_0_bridge_node,
-                self.imu_filter_arg,
-                self.imu_filter_node,
-            ],
-            'w200': self.common_platform_components + [
-                self.imu_0_bridge_node,
-                self.imu_filter_arg,
-                self.imu_filter_node,
-            ],
-        }
 
     def generate_sensors(self) -> None:
         sensors_service_launch_writer = LaunchWriter(self.sensors_service_launch_file)
@@ -215,11 +74,23 @@ class GzLaunchGenerator(LaunchGenerator):
         sensors_service_launch_writer.generate_file()
 
     def generate_platform(self) -> None:
+        """Generate the Gazebo platform service launch file via the PlatformLaunch registry."""
         platform_service_launch_writer = LaunchWriter(self.platform_service_launch_file)
         platform_service_launch_writer.add_launch_file(self.platform_launch_file)
 
-        # Platform components
-        for component in self.platform_components[self.platform_model]:
+        try:
+            platform_launch_cls = PlatformLaunch.get(self.platform_model)
+        except KeyError:
+            platform_service_launch_writer.generate_file()
+            return
+
+        platform_launch = platform_launch_cls(
+            self.namespace,
+            self.robot_name,
+            self.platform_params_path,
+            self.sensors_params_path,
+        )
+        for component in platform_launch.get_components():
             platform_service_launch_writer.add(component)
 
         platform_service_launch_writer.generate_file()
