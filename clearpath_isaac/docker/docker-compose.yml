@@ -1,0 +1,70 @@
+
+# Usage (run from this directory):
+#
+#   xhost +local:root                       # allow the container to reach your X server
+#   export HOST_UID=$(id -u) HOST_GID=$(id -g)   # REQUIRED: compose refuses to run without these
+#   docker compose build
+#   docker compose up -d
+#   docker compose exec clearpath-isaac bash
+#
+# Then, inside the container, build the workspace once:
+#
+#   cd /isaac-sim/workspace && colcon build --symlink-install && source install/setup.bash
+#
+# After that everything is sourced on every new shell:
+#
+#   ros2 run urdf2usd urdf2usd_export --xacro $(ros2 pkg prefix clearpath_isaac)/share/clearpath_isaac/urdf/dd100.urdf.xacro --output /isaac-sim/workspace/generated_assets/dd100/dd100.usd
+#   ros2 run urdf2usd urdf2usd_export --xacro $(ros2 pkg prefix clearpath_isaac)/share/clearpath_isaac/urdf/j100.urdf.xacro  --output /isaac-sim/workspace/generated_assets/j100/j100.usd
+#   ros2 run urdf2usd urdf2usd_export --xacro $(ros2 pkg prefix clearpath_isaac)/share/clearpath_isaac/urdf/a300.urdf.xacro  --output /isaac-sim/workspace/generated_assets/a300/a300.usd
+#   . ~/runapp.sh
+
+services:
+  clearpath-isaac:
+    build:
+      # Build context is the repository root so this repo's packages
+      # (clearpath_isaac + urdf2usd) can be copied into the workspace.
+      context: ../../../..
+      dockerfile: src/clearpath_simulator/clearpath_isaac/docker/Dockerfile
+      args:
+        ISAAC_SIM_VERSION: 5.1.0
+        ROS_VERSION: jazzy
+        # Required: refuse to build/run unless the host uid/gid are provided,
+        # e.g. `HOST_UID=$(id -u) HOST_GID=$(id -g) docker compose up`.
+        HOST_UID: ${HOST_UID:?set HOST_UID, e.g. HOST_UID=$(id -u) HOST_GID=$(id -g) docker compose up}
+        HOST_GID: ${HOST_GID:?set HOST_GID, e.g. HOST_UID=$(id -u) HOST_GID=$(id -g) docker compose up}
+    image: clearpath-isaac:5.1.0
+    container_name: clearpath-isaac
+    stdin_open: true
+    tty: true
+    network_mode: host
+    ipc: host
+
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu, graphics, display, compute, utility]
+
+    environment:
+      - ACCEPT_EULA=Y
+      - PRIVACY_CONSENT=Y
+      - OMNI_TELEMETRY_DISABLE_ANONYMOUS_DATA=1
+      - NVIDIA_VISIBLE_DEVICES=all
+      - NVIDIA_DRIVER_CAPABILITIES=all
+      - DISPLAY=${DISPLAY:-:0}
+
+    volumes:
+      - /tmp/.X11-unix:/tmp/.X11-unix:rw
+      - ${HOME}/.Xauthority:/isaac-sim/.Xauthority
+      - /var/tmp/isaac-sim/cache/main:/isaac-sim/.cache
+      - /var/tmp/isaac-sim/cache/computecache:/isaac-sim/.nv/ComputeCache
+      - /var/tmp/isaac-sim/logs:/isaac-sim/.nvidia-omniverse/logs
+      - /var/tmp/isaac-sim/config:/isaac-sim/.nvidia-omniverse/config
+      - /var/tmp/isaac-sim/data:/isaac-sim/.local/share/ov/data
+      - /var/tmp/isaac-sim/pkg:/isaac-sim/.local/share/ov/pkg
+      - ../../../..:/isaac-sim/workspace:rw
+      # Mount config scripts copied by Dockerfile so they are hot-editable.
+      - ./cyclonedds.xml:/isaac-sim/cyclonedds.xml:rw
+      - ./clearpath_isaac_env.sh:/isaac-sim/clearpath_isaac_env.sh:rw
