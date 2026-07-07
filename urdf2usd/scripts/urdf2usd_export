@@ -1,0 +1,191 @@
+#!/usr/bin/env python3
+# Software License Agreement (proprietary)
+#
+# \authors   Ahmed Hamouda <ahmed.hamouda@rockwellautomation.com>
+#
+# Copyright (c) 2026 Rockwell Automation Technologies, Inc. All Rights Reserved.
+#
+# Redistribution and use in source and binary forms, with or without
+# modification, is not permitted without the express permission of
+# Rockwell Automation Technologies, Inc.
+"""ROS-side entry point for ``ros2 run urdf2usd urdf2usd_export``.
+
+Runs under the system ROS 2 Python (Jazzy = 3.12). It writes two artefacts
+next to the requested ``--output`` USD:
+
+    <stem>.expanded.urdf        the fully-expanded URDF (xacro / RSP / file)
+    <stem>.isaac_inputs.json    the parsed <isaac_inputs> configuration
+
+then ``exec``s the Isaac Sim worker (``urdf2usd._isaac_worker``) under Isaac
+Sim's bundled Python. The split exists because ``xacro`` / ``rclpy`` and
+``isaacsim`` are C-extensions built for different Python versions and can't
+be loaded by the same interpreter, so each tool runs in its native one.
+"""
+from __future__ import annotations
+
+import argparse
+import json
+import os
+import subprocess
+import sys
+from pathlib import Path
+
+
+_DEFAULT_ISAAC_SIM_PATH = "/isaac-sim"
+
+
+def _build_parser() -> argparse.ArgumentParser:
+    p = argparse.ArgumentParser(
+        prog="urdf2usd_export",
+        description="Convert a URDF/xacro with <isaac_inputs> into an Isaac Sim USD.",
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter,
+    )
+    src = p.add_mutually_exclusive_group(required=True)
+    src.add_argument("--urdf", type=str, help="Path to a pre-expanded URDF file.")
+    src.add_argument("--xacro", type=str, help="Path to a xacro file (expanded via the xacro CLI).")
+    src.add_argument(
+        "--from-rsp",
+        action="store_true",
+        help="Fetch URDF from a running robot_state_publisher /robot_description topic.",
+    )
+    p.add_argument("--rsp-node", type=str, default="/robot_state_publisher",
+                   help="Node name when --from-rsp is set.")
+    p.add_argument("--external-inputs", type=str, default=None,
+                   help="Optional standalone XML file containing <isaac_inputs>.")
+    p.add_argument("--output", "-o", type=str, required=True, help="Destination USD path.")
+    p.add_argument(
+        "--headless", action=argparse.BooleanOptionalAction, default=True,
+        help="Run Isaac Sim without a window. Use --no-headless to view the conversion.",
+    )
+    p.add_argument("--keep-open", action="store_true",
+                   help="After saving, run the simulation loop until Ctrl-C.")
+    p.add_argument("--no-replace-packages", action="store_true",
+                   help="Skip package:// → absolute-path rewriting.")
+    p.add_argument(
+        "--keep-intermediates", action="store_true",
+        help="Keep <stem>.expanded.urdf and <stem>.isaac_inputs.json next to the USD "
+             "(otherwise the worker removes them on success).",
+    )
+    p.add_argument(
+        "--isaac-sim-path", type=str,
+        default=os.environ.get("ISAAC_SIM_PATH", _DEFAULT_ISAAC_SIM_PATH),
+        help="Isaac Sim install directory (must contain python.sh). "
+             "Overrides $ISAAC_SIM_PATH.",
+    )
+    return p
+
+
+def _load_urdf_text(args: argparse.Namespace) -> str:
+    if args.urdf:
+        from urdf2usd import get_xml_from_file
+        return get_xml_from_file(args.urdf)
+
+    if args.xacro:
+        xacro_path = Path(args.xacro).expanduser().resolve()
+        if not xacro_path.is_file():
+            raise FileNotFoundError(f"xacro file not found: {xacro_path}")
+        try:
+            result = subprocess.run(
+                ["xacro", str(xacro_path)],
+                check=True, capture_output=True, text=True,
+            )
+        except FileNotFoundError as exc:
+            raise RuntimeError(
+                "'xacro' CLI not found on PATH. Install ros-<distro>-xacro or pass --urdf."
+            ) from exc
+        except subprocess.CalledProcessError as exc:
+            raise RuntimeError(
+                f"xacro expansion failed:\n--- stdout ---\n{exc.stdout}\n"
+                f"--- stderr ---\n{exc.stderr}"
+            ) from exc
+        return result.stdout
+
+    if args.from_rsp:
+        from urdf2usd import get_urdf_from_rsp
+        return get_urdf_from_rsp(node_name=args.rsp_node)
+
+    raise RuntimeError("No URDF source selected.")  # argparse guarantees unreachable.
+
+
+def main(argv: list[str] | None = None) -> int:
+    args = _build_parser().parse_args(argv)
+
+    output_path = Path(args.output).expanduser().resolve()
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+
+    # Acquire URDF text
+    print(f"[urdf2usd] Loading URDF from "
+          f"{args.urdf or args.xacro or '<robot_state_publisher>'}")
+    urdf_xml = _load_urdf_text(args)
+
+    # package:// -> absolute path
+    if not args.no_replace_packages:
+        from urdf2usd import replace_package_names
+        urdf_xml = replace_package_names(urdf_xml)
+
+    # Parse <isaac_inputs>
+    import urdf2usd
+    from urdf2usd import get_xml_from_file, parse_isaac_inputs
+    external_xml = get_xml_from_file(args.external_inputs) if args.external_inputs else None
+    cfg = parse_isaac_inputs(urdf_xml=urdf_xml, external_xml=external_xml)
+    print(f"[urdf2usd] Parsed isaac_inputs: "
+          f"{len(cfg.get('link_materials', []))} link material bindings, "
+          f"{len(cfg.get('joint_properties', []))} joint bindings, "
+          f"{len(cfg.get('sensors', []))} sensors.")
+
+    # Persist intermediates next to the USD
+    stem = output_path.stem
+    urdf_file = output_path.parent / f"{stem}.expanded.urdf"
+    inputs_file = output_path.parent / f"{stem}.isaac_inputs.json"
+    urdf_file.write_text(urdf_xml)
+    inputs_file.write_text(json.dumps(cfg, indent=2))
+    print(f"[urdf2usd] Wrote intermediates:\n  {urdf_file}\n  {inputs_file}")
+
+    # Locate Isaac Sim
+    isaac_root = Path(args.isaac_sim_path).expanduser().resolve()
+    python_sh = isaac_root / "python.sh"
+    if not python_sh.is_file():
+        print(
+            f"[urdf2usd] ERROR: Isaac Sim Python launcher not found at {python_sh}\n"
+            f"  Pass --isaac-sim-path or set $ISAAC_SIM_PATH to the Isaac Sim install dir.",
+            file=sys.stderr,
+        )
+        return 2
+
+    # Build the Isaac-side environment.
+    #
+    # ament installs urdf2usd under the system ROS Python's site-packages
+    # (3.12 on Jazzy), which isn't on Isaac's bundled-Python sys.path. Derive
+    # that directory from the imported package and prepend it to PYTHONPATH so
+    # Isaac's interpreter can ``-m urdf2usd._isaac_worker``.
+    site_packages_dir = str(Path(urdf2usd.__file__).resolve().parent.parent)
+
+    env = {k: v for k, v in os.environ.items()
+           if k not in ("PYTHONHOME", "PYTHONEXECUTABLE")}
+    existing_pp = env.get("PYTHONPATH", "")
+    env["PYTHONPATH"] = (
+        site_packages_dir if not existing_pp
+        else f"{site_packages_dir}{os.pathsep}{existing_pp}"
+    )
+
+    worker_argv = [
+        str(python_sh), "-m", "urdf2usd._isaac_worker",
+        "--urdf-file", str(urdf_file),
+        "--inputs-json", str(inputs_file),
+        "--output", str(output_path),
+        ("--headless" if args.headless else "--no-headless"),
+    ]
+    if args.keep_open:
+        worker_argv.append("--keep-open")
+    if not args.keep_intermediates:
+        worker_argv.append("--cleanup-intermediates")
+
+    print(f"[urdf2usd] Handing off to Isaac Sim worker: {python_sh} -m urdf2usd._isaac_worker")
+    sys.stdout.flush()
+    sys.stderr.flush()
+    os.execvpe(worker_argv[0], worker_argv, env)
+    return 0  # unreachable
+
+
+if __name__ == "__main__":
+    sys.exit(main())

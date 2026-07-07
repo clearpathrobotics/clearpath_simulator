@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
+<package format="3">
+  <name>urdf2usd</name>
+  <version>0.0.1</version>
+  <description>
+    Convert a URDF/xacro to an Isaac Sim USD using a single ignorable
+    &lt;isaac_inputs&gt; block embedded in the URDF (or supplied as a separate XML
+    file). Mirrors the design of mujoco_ros2_control's make_mjcf_from_robot_description.
+  </description>
+  <maintainer email="ahmed.hamouda@rockwellautomation.com">Ahmed Hamouda</maintainer>
+
+  <license>Proprietary</license>
+
+  <buildtool_depend>ament_cmake</buildtool_depend>
+  <buildtool_depend>ament_cmake_python</buildtool_depend>
+
+  <exec_depend>ament_index_python</exec_depend>
+  <exec_depend>python3-numpy</exec_depend>
+  <exec_depend>rclpy</exec_depend>
+  <exec_depend>xacro</exec_depend>
+
+  <test_depend>ament_cmake_pytest</test_depend>
+
+  <export>
+    <build_type>ament_cmake</build_type>
+  </export>
+</package>
