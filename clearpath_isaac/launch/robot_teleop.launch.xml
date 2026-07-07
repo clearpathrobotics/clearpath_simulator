@@ -2,7 +2,7 @@
   <arg name="robot_path" description="Path to the robot USD file (absolute or relative)."/>
   <arg name="robot_prim" default="/World/robot" description="Prim path where the robot USD will be referenced."/>
   <arg name="spawn_z" default="0.15" description="Initial robot height in meters."/>
-  <arg name="namespace" default="a300" description="ROS 2 namespace for teleop and cmd_vel (a300, do100, or j100)."/>
+  <arg name="namespace" default="" description="ROS 2 namespace for teleop and cmd_vel."/>
   <arg name="headless" default="false" description="Run Isaac Sim without GUI (true/false)."/>
   <arg name="teleop" default="true" description="Launch teleop_twist_keyboard (true/false)."/>
   <arg name="isaac_python" default="/isaac-sim/python.sh" description="Path to Isaac Sim Python launcher."/>

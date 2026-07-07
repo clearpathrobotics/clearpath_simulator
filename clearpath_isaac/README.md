@@ -65,7 +65,7 @@ Swap `a300` for `do100` or `j100` as needed.
 ## 5. Run the simulation + teleop (inside the container)
 
 ```bash
-ros2 launch clearpath_isaac robot_teleop.launch.xml robot_path:=$OUT/a300/a300.usd
+ros2 launch clearpath_isaac robot_teleop.launch.xml robot_path:=$OUT/a300/a300.usd namespace:=a300
 ```
 
 Launch args:
@@ -74,7 +74,7 @@ Launch args:
 | ------------ | -------------- | ------------------------------------ |
 | `robot_path` | *(required)*   | Path to the exported robot USD       |
 | `robot_prim` | `/World/robot` | Prim path to reference the USD under |
-| `namespace`  | `a300`         | ROS 2 namespace for teleop and `cmd_vel` |
+| `namespace`  | `""`          | ROS 2 namespace for teleop and `cmd_vel` |
 | `spawn_z`    | `0.15`         | Initial spawn height (m)             |
 | `headless`   | `false`        | Run Isaac Sim without a GUI          |
 | `teleop`     | `true`         | Launch `teleop_twist_keyboard`       |
