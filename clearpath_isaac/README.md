@@ -43,7 +43,6 @@ docker compose exec clearpath-isaac bash
 mkdir -p ~/workspace/src
 cd ~/workspace/src
 
-# Clone this repo and clearpath_common on the branch you want to use
 git clone --branch feature/isaac-sim-support https://github.com/clearpathrobotics/clearpath_simulator.git
 git clone --branch feature/isaac-sim-support https://github.com/clearpathrobotics/clearpath_common.git
 
@@ -58,9 +57,7 @@ source install/setup.bash
 URDF_DIR=$(ros2 pkg prefix clearpath_isaac)/share/clearpath_isaac/urdf
 OUT=/isaac-sim/workspace/src/clearpath_simulator/clearpath_isaac/generated_assets
 
-ros2 run urdf2usd urdf2usd_export \
-  --xacro  $URDF_DIR/a300.urdf.xacro \
-  --output $OUT/a300/a300.usd
+ros2 run urdf2usd urdf2usd_export --xacro  $URDF_DIR/a300.urdf.xacro --output $OUT/a300/a300.usd
 ```
 
 Swap `a300` for `do100` or `j100` as needed.
@@ -68,8 +65,7 @@ Swap `a300` for `do100` or `j100` as needed.
 ## 5. Run the simulation + teleop (inside the container)
 
 ```bash
-ros2 launch clearpath_isaac robot_teleop.launch.xml \
-  robot_path:=/isaac-sim/workspace/src/clearpath_simulator/clearpath_isaac/generated_assets/a300/a300.usd
+ros2 launch clearpath_isaac robot_teleop.launch.xml robot_path:=$OUT/a300/a300.usd
 ```
 
 Launch args:
