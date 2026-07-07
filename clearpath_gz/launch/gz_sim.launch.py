@@ -15,14 +15,16 @@
 # @author Roni Kreinin (rkreinin@clearpathrobotics.com)
 
 import os
+import tempfile
 
 from ament_index_python.packages import get_package_share_directory
+from clearpath_config.clearpath_config import ClearpathConfig
 
 from launch import LaunchDescription
 from launch.actions import DeclareLaunchArgument, OpaqueFunction
 from launch.actions import IncludeLaunchDescription, SetEnvironmentVariable
 from launch.launch_description_sources import PythonLaunchDescriptionSource
-from launch.substitutions import LaunchConfiguration, PathJoinSubstitution
+from launch.substitutions import EnvironmentVariable, LaunchConfiguration, PathJoinSubstitution
 from launch_ros.actions import Node
 
 
@@ -35,6 +37,9 @@ ARGUMENTS = [
     DeclareLaunchArgument('auto_start', default_value='true',
                           choices=['true', 'false'],
                           description='Auto-start Gazebo simulation'),
+    DeclareLaunchArgument('setup_path',
+                          default_value=[EnvironmentVariable('HOME'), '/clearpath/'],
+                          description='Clearpath setup path'),
 ]
 
 
@@ -50,8 +55,28 @@ def gz_launch(context, *args, **kwargs):
     gz_sim_launch = PathJoinSubstitution(
         [pkg_ros_gz_sim, 'launch', 'gz_sim.launch.py'])
 
-    gui_config = PathJoinSubstitution(
-        [pkg_clearpath_gz, 'config', 'gui.config'])
+    static_gui_config = os.path.join(pkg_clearpath_gz, 'config', 'gui.config')
+
+    # Derive teleop topic from robot.yaml namespace
+    setup_path = LaunchConfiguration('setup_path').perform(context)
+    robot_yaml = os.path.join(setup_path, 'robot.yaml')
+    if os.path.isfile(robot_yaml):
+        clearpath_config = ClearpathConfig(robot_yaml)
+        namespace = clearpath_config.system.namespace
+        topic = f'/{namespace}/cmd_vel' if namespace not in ('', '/') else '/cmd_vel'
+        with open(static_gui_config) as f:
+            content = f.read()
+        content = content.replace(
+            '<plugin filename="Teleop">',
+            f'<plugin filename="Teleop">\n    <topic>{topic}</topic>'
+        )
+        tmp = tempfile.NamedTemporaryFile(
+            suffix='.config', delete=False, mode='w')
+        tmp.write(content)
+        tmp.close()
+        gui_config = tmp.name
+    else:
+        gui_config = static_gui_config
 
     auto_start_option = ''
     auto_start = LaunchConfiguration('auto_start').perform(context)

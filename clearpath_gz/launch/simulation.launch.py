@@ -66,7 +66,8 @@ def generate_launch_description():
     gz_sim = IncludeLaunchDescription(
         PythonLaunchDescriptionSource([gz_sim_launch]),
         launch_arguments=[
-            ('world', LaunchConfiguration('world'))
+            ('world', LaunchConfiguration('world')),
+            ('setup_path', LaunchConfiguration('setup_path')),
         ]
     )
 
