@@ -4,7 +4,7 @@ project(clearpath_isaac)
 find_package(ament_cmake REQUIRED)
 
 install(
-  DIRECTORY docker scripts urdf
+  DIRECTORY docker launch scripts urdf
   DESTINATION share/${PROJECT_NAME}
 )
 
