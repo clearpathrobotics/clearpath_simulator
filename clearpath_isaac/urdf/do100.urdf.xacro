@@ -1,0 +1,73 @@
+<?xml version="1.0"?>
+<!-- Isaac Sim aware DO100 (Dingo-O, omnidirectional 4WD mecanum). -->
+<robot xmlns:xacro="http://ros.org/wiki/xacro" name="do100_isaac">
+  <xacro:arg name="use_isaac" default="true"/>
+
+  <xacro:include filename="$(find clearpath_platform_description)/urdf/do100/do100.urdf.xacro"/>
+  <xacro:do100 control="omni_4wd" front_wheels="mecanum" rear_wheels="mecanum"/>
+
+  <xacro:macro name="do100_isaac_rollers" params="prefix count index:=0">
+    <xacro:if value="${index &lt; count}">
+      <link  name="${prefix}_roller_${index}_link" physics_material="rubber"/>
+      <joint name="${prefix}_roller_${index}_joint" properties="passive_roller"/>
+      <xacro:do100_isaac_rollers prefix="${prefix}" count="${count}" index="${index + 1}"/>
+    </xacro:if>
+  </xacro:macro>
+
+  <xacro:if value="$(arg use_isaac)">
+    <isaac_inputs>
+
+      <physics_scene time_steps_per_second="240" />
+
+      <import_config
+          merge_fixed_joints="true"
+          fix_base="false"
+          collision_from_visuals="false"/>
+
+      <articulation
+          chassis_link="base_link"
+          namespace="do100"
+          clock="true"
+          joint_states="true"
+          joint_commands="true"
+          odom="true"
+          tf="true"
+          cmd_vel="true"
+          drive_controller="holonomic"
+          cmd_vel_topic="cmd_vel"
+          wheel_radius="0.050"
+          wheel_joints="front_left_wheel_joint front_right_wheel_joint rear_left_wheel_joint rear_right_wheel_joint"
+          mecanum_angles="-135 -45 -45 -135"/>
+
+      <physics_material name="rubber" static_friction="1.0" dynamic_friction="1.0"
+                        restitution="0.0" friction_combine_mode="max"/>
+
+      <!-- Velocity-controlled omni-drive wheels (all four mecanum hubs) -->
+      <joint_properties name="omni_drive_wheel"
+                        control_mode="velocity"
+                        drive_type="force"
+                        stiffness="0.0"
+                        damping="10000.0"
+                        max_effort="8.0"
+                        max_velocity="26.0"/>
+      <joint name="front_left_wheel_joint"  properties="omni_drive_wheel"/>
+      <joint name="front_right_wheel_joint" properties="omni_drive_wheel"/>
+      <joint name="rear_left_wheel_joint"   properties="omni_drive_wheel"/>
+      <joint name="rear_right_wheel_joint"  properties="omni_drive_wheel"/>
+
+      <joint_properties name="passive_roller"
+                        control_mode="velocity"
+                        drive_type="force"
+                        stiffness="0.0"
+                        damping="28.65"
+                        max_effort="0.12"/>
+
+      <!-- Rollers + passive joints for each wheel's ring. -->
+      <xacro:do100_isaac_rollers prefix="front_left"  count="9"/>
+      <xacro:do100_isaac_rollers prefix="front_right" count="9"/>
+      <xacro:do100_isaac_rollers prefix="rear_left"   count="9"/>
+      <xacro:do100_isaac_rollers prefix="rear_right"  count="9"/>
+    </isaac_inputs>
+  </xacro:if>
+
+</robot>

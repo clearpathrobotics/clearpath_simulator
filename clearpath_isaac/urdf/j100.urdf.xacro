@@ -1,0 +1,60 @@
+<?xml version="1.0"?>
+<!-- Isaac Sim aware J100 (Jackal, 4WD skid-steer). -->
+<robot xmlns:xacro="http://ros.org/wiki/xacro" name="j100_isaac">
+  <xacro:arg name="use_isaac" default="true"/>
+
+  <xacro:include filename="$(find clearpath_platform_description)/urdf/j100/j100.urdf.xacro"/>
+  <xacro:j100 control="diff_4wd" front_wheels="outdoor" rear_wheels="outdoor"/>
+
+  <xacro:if value="$(arg use_isaac)">
+    <isaac_inputs>
+
+      <import_config
+          merge_fixed_joints="true"
+          fix_base="false"
+          collision_from_visuals="false"/>
+
+      <articulation
+          chassis_link="base_link"
+          namespace="j100"
+          clock="true"
+          joint_states="true"
+          joint_commands="true"
+          odom="true"
+          tf="true"
+          cmd_vel="true"
+          drive_controller="diff"
+          cmd_vel_topic="cmd_vel"
+          wheel_radius="0.098"
+          wheel_distance="0.37559"
+          front_wheel_joints="front_left_wheel_joint front_right_wheel_joint"
+          rear_wheel_joints="rear_left_wheel_joint rear_right_wheel_joint"/>
+
+      <physics_material name="rubber" static_friction="0.7" dynamic_friction="0.7" restitution="0.0"/>
+      <visual_material name="clearpath_black"     diffuse="0.15 0.15 0.15" roughness="0.8" metallic="0.0"/>
+
+      <link name="front_left_wheel_link"  physics_material="rubber"/>
+      <link name="front_right_wheel_link" physics_material="rubber"/>
+      <link name="rear_left_wheel_link"   physics_material="rubber"/>
+      <link name="rear_right_wheel_link"  physics_material="rubber"/>
+
+      <!-- GPS antenna (black) -->
+      <link name="gps_0_link" visual_material="clearpath_black"/>
+
+      <joint_properties name="diff_drive_wheel"
+                        control_mode="velocity"
+                        drive_type="force"
+                        stiffness="0.0"
+                        damping="100.0"
+                        max_effort="10.0"
+                        max_velocity="20"/>
+
+      <joint name="front_left_wheel_joint"  properties="diff_drive_wheel"/>
+      <joint name="front_right_wheel_joint" properties="diff_drive_wheel"/>
+      <joint name="rear_left_wheel_joint"   properties="diff_drive_wheel"/>
+      <joint name="rear_right_wheel_joint"  properties="diff_drive_wheel"/>
+
+    </isaac_inputs>
+  </xacro:if>
+
+</robot>

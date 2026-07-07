@@ -1,0 +1,63 @@
+<?xml version="1.0"?>
+<!-- Isaac Sim aware DO100 (Dingo-O) with a small sensor suite -->
+<robot xmlns:xacro="http://ros.org/wiki/xacro" name="do100_sensors_isaac">
+
+  <xacro:include filename="$(find clearpath_isaac)/urdf/do100.urdf.xacro"/>
+
+  <!-- Bare Clearpath mount hard points (default_mount, front_0_mount, ...) are
+       massless and get merged away on import, so every sensor rides a small
+       dummy-inertia link fixed to the chosen mount. -->
+  <xacro:macro name="sensor_link" params="name parent *origin">
+    <link name="${name}">
+      <inertial>
+        <mass value="0.001"/>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <inertia ixx="1e-09" ixy="0.0" ixz="0.0" iyy="1e-09" iyz="0.0" izz="1e-09"/>
+      </inertial>
+    </link>
+    <joint name="${name}_joint" type="fixed">
+      <xacro:insert_block name="origin"/>
+      <parent link="${parent}"/>
+      <child link="${name}"/>
+    </joint>
+  </xacro:macro>
+
+  <!-- Velodyne tower mount for 3D lidar. -->
+  <xacro:include filename="$(find clearpath_platform_description)/urdf/do100/attachments/velodyne_tower.urdf.xacro"/>
+  <xacro:velodyne_tower name="velodyne_tower" parent_link="default_mount">
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+  </xacro:velodyne_tower>
+
+  <xacro:sensor_link name="lidar3d_link" parent="velodyne_tower_lidar_mount">
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+  </xacro:sensor_link>
+  <xacro:sensor_link name="front_scan_link" parent="front_0_mount">
+    <origin xyz="0 0 0.05" rpy="0 0 0"/>
+  </xacro:sensor_link>
+  <xacro:sensor_link name="front_camera_link" parent="front_0_mount">
+    <origin xyz="0.01 0 0.05" rpy="0 0 0"/>
+  </xacro:sensor_link>
+
+  <xacro:if value="$(arg use_isaac)">
+    <isaac_inputs>
+
+      <!-- 3D spinning lidar, point cloud (Ouster OS0: short range, wide FOV). -->
+      <sensor name="lidar_3d" type="rtx_lidar" link="lidar3d_link"
+              ros2="true" frame_id="lidar3d_link"
+              config="OS0" variant="OS0_REV7_128ch10hz512res"
+              laser_scan="false"
+              point_cloud="true" point_cloud_topic="lidar/points"/>
+
+
+      <!-- Front RGB camera: mono color (RealSense D455). -->
+      <sensor name="front_camera" type="rgb_camera" link="front_camera_link"
+              ros2="true" frame_id="front_camera_link"
+              asset="{nucleus}/Isaac/Sensors/Intel/RealSense/rsd455.usd"
+              rgb="true" rgb_topic="front_camera/color/image_raw"
+              rgb_camera_info_topic="front_camera/color/camera_info"
+              frequency="30.0"/>
+
+    </isaac_inputs>
+  </xacro:if>
+
+</robot>

@@ -1,0 +1,63 @@
+<?xml version="1.0"?>
+<!-- Isaac Sim aware A300 (4WD skid-steer) with a small sensor suite -->
+<robot xmlns:xacro="http://ros.org/wiki/xacro" name="a300_sensors_isaac">
+
+  <xacro:include filename="$(find clearpath_isaac)/urdf/a300.urdf.xacro"/>
+
+  <!-- Bare Clearpath mount hard points (default_mount, front_0_mount, ...) are
+       massless and get merged away on import, so every sensor rides a small
+       dummy-inertia link fixed to the chosen mount. -->
+  <xacro:macro name="sensor_link" params="name parent *origin">
+    <link name="${name}">
+      <inertial>
+        <mass value="0.001"/>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <inertia ixx="1e-09" ixy="0.0" ixz="0.0" iyy="1e-09" iyz="0.0" izz="1e-09"/>
+      </inertial>
+    </link>
+    <joint name="${name}_joint" type="fixed">
+      <xacro:insert_block name="origin"/>
+      <parent link="${parent}"/>
+      <child link="${name}"/>
+    </joint>
+  </xacro:macro>
+
+  <xacro:sensor_link name="lidar3d_link" parent="velodyne_tower_lidar_mount">
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+  </xacro:sensor_link>
+
+  <!-- Velodyne tower mount for 3D lidar. -->
+  <xacro:include filename="$(find clearpath_platform_description)/urdf/a300/attachments/velodyne_tower.urdf.xacro"/>
+  <xacro:velodyne_tower name="velodyne_tower" parent_link="default_mount">
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+  </xacro:velodyne_tower>
+
+  <xacro:sensor_link name="front_camera_link" parent="default_mount">
+    <origin xyz="0.05 0 0.05" rpy="0 0 0"/>
+  </xacro:sensor_link>
+
+  <xacro:if value="$(arg use_isaac)">
+    <isaac_inputs>
+
+      <!-- 3D spinning lidar, point cloud (Ouster OS1: long range outdoor). -->
+      <sensor name="lidar_3d" type="rtx_lidar" link="lidar3d_link"
+              ros2="true" frame_id="lidar3d_link"
+              config="OS1" variant="OS0_REV7_128ch10hz512res"
+              laser_scan="false"
+              point_cloud="true" point_cloud_topic="lidar/points"/>
+
+      <!-- Front depth camera: rgb, depth and point cloud (RealSense D455). -->
+      <sensor name="front_camera" type="depth_camera" link="front_camera_link"
+              ros2="true" frame_id="front_camera_link"
+              asset="{nucleus}/Isaac/Sensors/Intel/RealSense/rsd455.usd"
+              rgb="true"       rgb_topic="front_camera/color/image_raw"
+              rgb_camera_info_topic="front_camera/color/camera_info"
+              depth="true"     depth_topic="front_camera/depth/image_rect_raw"
+              depth_pcl="true" depth_pcl_topic="front_camera/depth/points"
+              depth_camera_info_topic="front_camera/depth/camera_info"
+              frequency="30.0"/>
+
+    </isaac_inputs>
+  </xacro:if>
+
+</robot>
