@@ -2,6 +2,14 @@
 Changelog for package clearpath_gz
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Added automapping for teleop topic on Gazebo GUI.
+* [Humble] Fix: CI in Container (`#104 <https://github.com/clearpathrobotics/clearpath_simulator/issues/104>`_)
+  Co-authored-by: luis-camero <88782189+luis-camero@users.noreply.github.com>
+  Co-authored-by: Tony Baltovski <tbaltovski@clearpathrobotics.com>
+* Contributors: mergify[bot]
+
 1.3.2 (2025-07-14)
 ------------------
 * Fixed `generate` flag for `robot_spawn` (`#89 <https://github.com/clearpathrobotics/clearpath_simulator/issues/89>`_)
