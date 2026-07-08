@@ -2,8 +2,8 @@
 Changelog for package clearpath_gz
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.3.3 (2026-07-08)
+------------------
 * Added automapping for teleop topic on Gazebo GUI.
 * [Humble] Fix: CI in Container (`#104 <https://github.com/clearpathrobotics/clearpath_simulator/issues/104>`_)
   Co-authored-by: luis-camero <88782189+luis-camero@users.noreply.github.com>

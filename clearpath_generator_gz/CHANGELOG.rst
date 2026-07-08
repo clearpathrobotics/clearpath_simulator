@@ -2,8 +2,8 @@
 Changelog for package clearpath_generator_gz
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.3.3 (2026-07-08)
+------------------
 * [Humble] Fix: CI in Container
   Co-authored-by: luis-camero <88782189+luis-camero@users.noreply.github.com>
   Co-authored-by: Tony Baltovski <tbaltovski@clearpathrobotics.com>
