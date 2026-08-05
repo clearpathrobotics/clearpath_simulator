@@ -125,7 +125,7 @@ class GzLaunchGenerator(LaunchGenerator):
         self.imu_filter_node = LaunchFile.Node(
             package='imu_filter_madgwick',
             executable='imu_filter_madgwick_node',
-            name='imu_filter_node',
+            name='imu_filter_madgwick',
             namespace=self.namespace,
             parameters=[imu_filter_variable],
             remappings=[
