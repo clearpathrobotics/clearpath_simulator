@@ -2,6 +2,9 @@
 Changelog for package clearpath_gz
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+
 2.9.3 (2026-07-08)
 ------------------
 * Added automapping for teleop topic on Gazebo GUI. (`#115 <https://github.com/clearpathrobotics/clearpath_simulator/issues/115>`_)

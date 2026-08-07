@@ -2,6 +2,11 @@
 Changelog for package clearpath_generator_gz
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Fixed the name of the imu_filter node to match what is being launched. (`#117 <https://github.com/clearpathrobotics/clearpath_simulator/issues/117>`_)
+* Contributors: Tony Baltovski
+
 2.9.3 (2026-07-08)
 ------------------
 
