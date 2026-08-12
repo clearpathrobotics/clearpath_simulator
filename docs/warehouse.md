@@ -1,7 +1,7 @@
-## Warehouse World
+# Warehouse World
 
-<img src="warehouse/warehouse_world.png">
+![Warehouse world](warehouse/warehouse_world.png)
 
-<img src="warehouse/worker.png">
+![Worker](warehouse/worker.png)
 
-<img src="warehouse/shelves.png">
+![Shelves](warehouse/shelves.png)

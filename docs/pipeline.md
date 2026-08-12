@@ -1,11 +1,11 @@
-## Pipeline World
+# Pipeline World
 
-<img src="pipeline/pipeline_world.png">
+![Pipeline world](pipeline/pipeline_world.png)
 
-<img src="pipeline/bridge.png">
+![Bridge](pipeline/bridge.png)
 
-<img src="pipeline/cave.png">
+![Cave](pipeline/cave.png)
 
-<img src="pipeline/pipeline.png">
+![Pipeline](pipeline/pipeline.png)
 
-<img src="pipeline/solar_panels.png">
+![Solar panels](pipeline/solar_panels.png)
