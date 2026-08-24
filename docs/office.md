@@ -1,9 +1,9 @@
-## Office World
+# Office World
 
-<img src="office/office_world.png">
+![Office world](office/office_world.png)
 
-<img src="office/common_area.png">
+![Common area](office/common_area.png)
 
-<img src="office/meeting_room.png">
+![Meeting room](office/meeting_room.png)
 
-<img src="office/hallway.png">
+![Hallway](office/hallway.png)

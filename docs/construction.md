@@ -1,7 +1,7 @@
-## Consruction World
+# Construction World
 
-<img src="construction/construction_world.png">
+![Construction world](construction/construction_world.png)
 
-<img src="construction/worksite.png">
+![Construction worksite](construction/worksite.png)
 
-<img src="construction/walls.png">
+![Construction walls](construction/walls.png)
