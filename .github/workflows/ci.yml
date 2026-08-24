@@ -17,7 +17,7 @@ jobs:
       fail-fast: false
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v7
       - uses: 'ros-industrial/industrial_ci@master'
         env: ${{matrix.env}}
 
@@ -27,7 +27,7 @@ jobs:
     container:
       image: rostooling/setup-ros-docker:ubuntu-noble-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v7
       - uses: ros-tooling/action-ros-ci@v0.3
         id: action_ros_ci_step
         with:
@@ -44,9 +44,9 @@ jobs:
     container:
       image: rostooling/setup-ros-docker:ubuntu-noble-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v7
       - name: "[Repositories Updater] Checkout action"
-        uses: actions/checkout@v3
+        uses: actions/checkout@v7
         with:
           repository: clearpathrobotics/repos-dep-update-action
           ref: 0.0.4
@@ -86,9 +86,9 @@ jobs:
     container:
       image: rostooling/setup-ros-docker:ubuntu-noble-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v7
       - name: "[Repositories Updater] Checkout action"
-        uses: actions/checkout@v3
+        uses: actions/checkout@v7
         with:
           repository: clearpathrobotics/repos-dep-update-action
           ref: 0.0.4
@@ -123,9 +123,9 @@ jobs:
     container:
       image: rostooling/setup-ros-docker:ubuntu-noble-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v7
       - name: "[Repositories Updater] Checkout action"
-        uses: actions/checkout@v3
+        uses: actions/checkout@v7
         with:
           repository: clearpathrobotics/repos-dep-update-action
           ref: 0.0.4
