@@ -75,14 +75,14 @@ ros2 launch clearpath_gz simulation.launch.py world:=pipeline
 
 Available worlds are:
 
-| World                 | Description                                                                                                            | Screenshots                  | Geographic Location      |
-|-----------------------|------------------------------------------------------------------------------------------------------------------------|------------------------------|--------------------------|
-| `construction`        | The same floorplan as the `office` world, but under construction. Features non-solid walls and debris piles.           | [link](docs/construction.md) | Waterloo ON, Canada      |
-| `office`              | The same floorplan as the `construction` world. Features narrow hallways, doorways, meeting rooms, and loading docks.  | [link](docs/office.md)       | Waterloo ON, Canada      |
-| `orchard`             | An outdoor, agricultural environment featuring rows of trees. The terrain has small slopes, but is mostly flat.        | [link](docs/orchard.md)      | Nikea, Greece            |
-| `pipeline`            | A rugged, outdoor environment featuring steeper hills, a river and bridge, a small cave, solar panels, and a pipeline. | [link](docs/pipeline.md)     | Northern Alberta, Canada |
-| `solar_farm`          | An outdoor, agricultural environment featuring gentle hills, a barn, rows of solar panels, and fences.                | [link](docs/solar_farm.md)   | Stonewall MB, Canada     |
-| `warehouse` (default) | A flat, indoor warehouse environment. Features shelves and people.                                                     | [link](docs/warehouse.md)    | Rio de Janeiro, Brazil   |
+| World                 | Description                                                                                                            | Screenshots                                      | Geographic Location      |
+|-----------------------|------------------------------------------------------------------------------------------------------------------------|--------------------------------------------------|--------------------------|
+| `construction`        | The same floorplan as the `office` world, but under construction. Features non-solid walls and debris piles.           | [construction screenshots](docs/construction.md) | Waterloo ON, Canada      |
+| `office`              | The same floorplan as the `construction` world. Features narrow hallways, doorways, meeting rooms, and loading docks.  | [office screenshots](docs/office.md)             | Waterloo ON, Canada      |
+| `orchard`             | An outdoor, agricultural environment featuring rows of trees. The terrain has small slopes, but is mostly flat.        | [orchard screenshots](docs/orchard.md)           | Nikea, Greece            |
+| `pipeline`            | A rugged, outdoor environment featuring steeper hills, a river and bridge, a small cave, solar panels, and a pipeline. | [pipeline screenshots](docs/pipeline.md)         | Northern Alberta, Canada |
+| `solar_farm`          | An outdoor, agricultural environment featuring gentle hills, a barn, rows of solar panels, and fences.                 | [solar farm screenshots](docs/solar_farm.md)     | Stonewall MB, Canada     |
+| `warehouse` (default) | A flat, indoor warehouse environment. Features shelves and people.                                                     | [warehouse screenshots](docs/warehouse.md)       | Rio de Janeiro, Brazil   |
 
 ## Generator Tests
 
