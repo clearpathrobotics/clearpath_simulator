@@ -35,6 +35,7 @@ from clearpath_config.sensors.types.cameras import (
     IntelRealsense,
     StereolabsZed
 )
+from clearpath_config.sensors.types.ptu import BasePTU
 from clearpath_config.sensors.types.sensor import BaseSensor
 from clearpath_generator_common.common import LaunchFile, ParamFile
 from clearpath_generator_common.launch.writer import LaunchWriter
@@ -76,13 +77,19 @@ class SensorLaunch():
             self.name,
             path=launch_path)
 
-        self.static_tf_node = LaunchFile.get_static_tf_node(
-            name=self.name,
-            namespace=self._robot_namespace,
-            parent_link=self.name + '_link',
-            child_link=self.robot_name + '/base_link/' + self.name,
-            use_sim_time=True
-        )
+        # PTUs don't have a single `<name>_link` frame (they expose
+        # base/pan/tilt/mount links driven by revolute joints), so the
+        # sensor-to-gz static transform is neither valid nor required.
+        if self.sensor.SENSOR_TYPE == BasePTU.SENSOR_TYPE:
+            self.static_tf_node = None
+        else:
+            self.static_tf_node = LaunchFile.get_static_tf_node(
+                name=self.name,
+                namespace=self._robot_namespace,
+                parent_link=self.name + '_link',
+                child_link=self.robot_name + '/base_link/' + self.name,
+                use_sim_time=True
+            )
 
         self.gz_bridge_node = LaunchFile.Node(
             name=self.name + '_gz_bridge',
@@ -141,11 +148,123 @@ class SensorLaunch():
             )
             self.extra_gz_nodes.append(depth_bridge_node)
 
+<<<<<<< HEAD
+=======
+        if self.sensor.SENSOR_MODEL in self.PTZ_CAMERAS:
+            image_ns = '/' + self.namespace + self.name
+            image_topic = image_ns + '/image'
+
+            image_bridge_node = LaunchFile.Node(
+                name=self.name + '_gz_image_bridge',
+                namespace=self.namespace,
+                package='ros_gz_image',
+                executable='image_bridge',
+                parameters=[{
+                    'use_sim_time': True,
+                }],
+                arguments=[image_topic],
+                remappings=[
+                    (image_topic, image_ns + '/_/image_raw'),
+                    (image_topic + '/compressed', image_ns + '/_/compressed'),
+                    (image_topic + '/compressedDepth', image_ns + '/_/compressedDepth'),
+                    (image_topic + '/theora', image_ns + '/_/theora'),
+                ]
+            )
+            self.extra_gz_nodes.append(image_bridge_node)
+
+            cmd_ns = '/' + self.namespace + self.name
+            cmd_bridge_node = LaunchFile.Node(
+                name=self.name + '_gz_cmd_bridge',
+                namespace=self.namespace,
+                package='ros_gz_bridge',
+                executable='parameter_bridge',
+                parameters=[{'use_sim_time': True}],
+                arguments=[
+                    cmd_ns + '/cmd_pan_vel' + self.ROS_TO_GZ_FLOAT,
+                    cmd_ns + '/cmd_tilt_vel' + self.ROS_TO_GZ_FLOAT,
+                    cmd_ns + '/pan_joint_state' + self.GZ_TO_ROS_JOINTSTATE,
+                    cmd_ns + '/tilt_joint_state' + self.GZ_TO_ROS_JOINTSTATE,
+                ],
+                remappings=[
+                    (cmd_ns + '/pan_joint_state', '/' + self._robot_namespace + '/platform/joint_states'),  # noqa:E501
+                    (cmd_ns + '/tilt_joint_state', '/' + self._robot_namespace + '/platform/joint_states'),  # noqa:E501
+                    (cmd_ns + '/cmd_pan_vel', cmd_ns + '/_/cmd_pan_vel'),
+                    (cmd_ns + '/cmd_tilt_vel', cmd_ns + '/_/cmd_tilt_vel'),
+                ],
+            )
+            self.extra_gz_nodes.append(cmd_bridge_node)
+
+            ptz_node = LaunchFile.Node(
+                name='ptz_action_server_node',
+                namespace=image_ns,
+                package='clearpath_generator_gz',
+                executable='ptz_controller_node',
+                parameters=[
+                    {'use_sim_time': True},
+                    {'camera_name': self.name},
+                ],
+                remappings=[
+                    ('image_in', image_ns + '/_/image_raw'),
+                    ('image_out', image_ns + '/color/image'),
+                    ('cmd/velocity', image_ns + '/cmd/velocity'),
+                    ('joint_states', '/' + self._robot_namespace + '/platform/joint_states'),
+                    ('cmd_pan_vel', cmd_ns + '/_/cmd_pan_vel'),
+                    ('cmd_tilt_vel', cmd_ns + '/_/cmd_tilt_vel'),
+                ],
+            )
+            self.extra_gz_nodes.append(ptz_node)
+
+        # FLIR PTU: bridge joint-state from gz and relay /ptu/cmd positions
+        # to the Gazebo JointPositionController topics.
+        if self.sensor.SENSOR_TYPE == BasePTU.SENSOR_TYPE:
+            cmd_ns = '/' + self.namespace + self.name
+            gz_prefix = '/' + self.name
+            ptu_bridge_node = LaunchFile.Node(
+                name=self.name + '_gz_ptu_bridge',
+                namespace=self.namespace,
+                package='ros_gz_bridge',
+                executable='parameter_bridge',
+                parameters=[{'use_sim_time': True}],
+                arguments=[
+                    gz_prefix + '/cmd_pan' + self.ROS_TO_GZ_FLOAT,
+                    gz_prefix + '/cmd_tilt' + self.ROS_TO_GZ_FLOAT,
+                    gz_prefix + '/joint_states' + self.GZ_TO_ROS_JOINTSTATE,
+                ],
+                remappings=[
+                    (gz_prefix + '/cmd_pan', cmd_ns + '/cmd_pan'),
+                    (gz_prefix + '/cmd_tilt', cmd_ns + '/cmd_tilt'),
+                    (gz_prefix + '/joint_states', cmd_ns + '/state'),
+                ],
+            )
+            self.extra_gz_nodes.append(ptu_bridge_node)
+
+            ptu_relay_node = LaunchFile.Node(
+                name=self.name + '_sim_relay',
+                namespace=self.namespace,
+                package='clearpath_generator_gz',
+                executable='ptu_sim_relay_node',
+                parameters=[
+                    {'use_sim_time': True},
+                    {'pan_joint': self.name + '_pan'},
+                    {'tilt_joint': self.name + '_tilt'},
+                ],
+                remappings=[
+                    ('cmd', '/ptu/cmd'),
+                    ('cmd_pan', cmd_ns + '/cmd_pan'),
+                    ('cmd_tilt', cmd_ns + '/cmd_tilt'),
+                    ('state', cmd_ns + '/state'),
+                    ('joint_states', '/' + self._robot_namespace + '/platform/joint_states'),
+                ],
+            )
+            self.extra_gz_nodes.append(ptu_relay_node)
+
+>>>>>>> 51dd3ff (Feature: PTU (#109))
     def generate(self):
         sensor_writer = LaunchWriter(self.launch_file)
         # Add sensor bridge and tf nodes
         sensor_writer.add(self.gz_bridge_node)
-        sensor_writer.add(self.static_tf_node)
+        if self.static_tf_node is not None:
+            sensor_writer.add(self.static_tf_node)
         sensor_writer.add(self.prefix_launch_arg)
         for node in self.extra_gz_nodes:
             sensor_writer.add(node)

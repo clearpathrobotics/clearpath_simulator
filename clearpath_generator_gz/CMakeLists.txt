@@ -11,6 +11,11 @@ find_package(ament_cmake_python REQUIRED)
 
 install(PROGRAMS
   ${PROJECT_NAME}/launch/generate_launch
+<<<<<<< HEAD
+=======
+  ${PROJECT_NAME}/nodes/ptz_controller_node
+  ${PROJECT_NAME}/nodes/ptu_sim_relay_node
+>>>>>>> 51dd3ff (Feature: PTU (#109))
   ${PROJECT_NAME}/param/generate_param
   DESTINATION lib/${PROJECT_NAME}
 )
