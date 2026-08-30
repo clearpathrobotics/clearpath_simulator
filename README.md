@@ -37,4 +37,64 @@ Copy your `robot.yaml` into `~/clearpath`
 
 ```
 ros2 launch clearpath_gz simulation.launch.py
+<<<<<<< HEAD
 ```
+=======
+```
+
+## Worlds
+
+The `clearpath_gz` package includes several simulation worlds. To select a specific world, use the
+`world` launch parameter, e.g.
+```
+ros2 launch clearpath_gz simulation.launch.py world:=pipeline
+```
+
+Available worlds are:
+
+| World                 | Description                                                                                                            | Screenshots                  | Geographic Location      |
+|-----------------------|------------------------------------------------------------------------------------------------------------------------|------------------------------|--------------------------|
+| `construction`        | The same floorplan as the `office` world, but under construction. Features non-solid walls and debris piles.           | [link](docs/construction.md) | Waterloo ON, Canada      |
+| `office`              | The same floorplan as the `construction` world. Features narrow hallways, doorways, meeting rooms, and loading docks.  | [link](docs/office.md)       | Waterloo ON, Canada      |
+| `orchard`             | An outdoor, agricultural environment featuring rows of trees. The terrain has small slopes, but is mostly flat.        | [link](docs/orchard.md)      | Nikea, Greece            |
+| `pipeline`            | A rugged, outdoor environment featuring steeper hills, a river and bridge, a small cave, solar panels, and a pipeline. | [link](docs/pipeline.md)     | Northern Alberta, Canada |
+| `solar_farm`          | An outdoor, agricultural environmentf featuring gentle hills, a barn, rows of solar panels, and fences.                | [link](docs/solar_farm.md)   | Stonewall MB, Canada     |
+| `warehouse` (default) | A flat, indoor warehouse environment. Features shelves and people.                                                     | [link](docs/warehouse.md)    | Rio de Janeiro, Brazil   |
+
+## Generator Tests
+
+Changes to the generators in this repository (`clearpath_generator_gz`) may affect the
+generated output for launch files and parameter files. The
+[clearpath_generator_tests](https://github.com/clearpathrobotics/clearpath_generator_tests)
+repository versions the expected output and validates it through CI.
+
+Before merging, ensure a corresponding branch with the **same name** exists in
+`clearpath_generator_tests` with regenerated samples. See the
+[Development Workflow](https://github.com/clearpathrobotics/clearpath_generator_tests#development-workflow)
+section of `clearpath_generator_tests` for the full process.
+
+
+## Creating Map Tiles
+
+The `orchard`, `pipeline`, and `solar_farm` worlds include geotagged TIF images in the `geotif`
+directory. These images can be used to generate map tiles of the simulation environment, if
+desired.
+
+To generate the tiles, first install the `gdal-bin` package:
+```bash
+sudo apt install gdal-bin
+```
+
+Then run the following command to generate the tiles:
+```bash
+gdal2tiles.py $(ros2 pkg prefix clearpath_gz)/share/clearpath_gz/geotif/WORLD_geo.tif
+```
+substituting `WORLD` with `orchard`, `pipeline`, or `solar_farm`.
+
+The generated files will be located in the current working directory in a new directory called
+`WORLD_geo` (e.g. `pipeline_geo`).
+
+Note that while the simulation worlds' locations have been chosen to be geographically similar to
+the envrionments depicted, the simulations are wholly fictional locations; the generated tiles
+will not mesh seamlessly into any satellite map of the region depicted.
+>>>>>>> 9c9f9b5 (Feature: Generator Sample Tests (#107))
