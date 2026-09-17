@@ -86,7 +86,7 @@ section of that repository for the full process.
 ## Continuous integration
 
 Every pull request runs [`clearpath_simulator_ci`](.github/workflows/ci.yml). The jobs differ in
-whether they pick up **upstream changes** — commits on a branch with the **same name** as your
+whether or not they pick up **upstream changes** — commits on a branch with the **same name** as your
 branch in one of the repositories listed in [`dependencies.repos`](dependencies.repos) (for example
 `clearpath_common` or `clearpath_config`). The
 [repos-dep-update-action](https://github.com/clearpathrobotics/repos-dep-update-action) swaps those
