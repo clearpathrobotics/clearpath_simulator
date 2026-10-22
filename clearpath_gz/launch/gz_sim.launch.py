@@ -37,6 +37,9 @@ ARGUMENTS = [
     DeclareLaunchArgument('auto_start', default_value='true',
                           choices=['true', 'false'],
                           description='Auto-start Gazebo simulation'),
+    DeclareLaunchArgument('headless', default_value='false',
+                          choices=['true', 'false'],
+                          description='Run Gazebo server only, without the GUI'),
     DeclareLaunchArgument('setup_path',
                           default_value=[EnvironmentVariable('HOME'), '/clearpath/'],
                           description='Clearpath setup path'),
@@ -83,6 +86,12 @@ def gz_launch(context, *args, **kwargs):
     if (auto_start == 'true'):
         auto_start_option = ' -r'
 
+    if LaunchConfiguration('headless').perform(context) == 'true':
+        # Server only; headless rendering lets sensors render without a display
+        mode_option = ' -s --headless-rendering'
+    else:
+        mode_option = ' --gui-config ' + gui_config
+
     # Gazebo Simulator
     gz_sim = IncludeLaunchDescription(
         PythonLaunchDescriptionSource([gz_sim_launch]),
@@ -91,8 +100,7 @@ def gz_launch(context, *args, **kwargs):
                          '.sdf',
                          auto_start_option,
                          ' -v 4',
-                         ' --gui-config ',
-                         gui_config])
+                         mode_option])
         ]
     )
 

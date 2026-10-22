@@ -36,6 +36,9 @@ ARGUMENTS = [
                               'warehouse',
                           ],
                           description='Gazebo World'),
+    DeclareLaunchArgument('headless', default_value='false',
+                          choices=['true', 'false'],
+                          description='Run Gazebo server only, without the GUI'),
     DeclareLaunchArgument('setup_path',
                           default_value=[EnvironmentVariable('HOME'), '/clearpath/'],
                           description='Clearpath setup path'),
@@ -67,6 +70,7 @@ def generate_launch_description():
         PythonLaunchDescriptionSource([gz_sim_launch]),
         launch_arguments=[
             ('world', LaunchConfiguration('world')),
+            ('headless', LaunchConfiguration('headless')),
             ('setup_path', LaunchConfiguration('setup_path')),
         ]
     )
