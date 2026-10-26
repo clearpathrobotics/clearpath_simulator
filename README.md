@@ -64,6 +64,15 @@ Copy your `robot.yaml` into `~/clearpath`
 ros2 launch clearpath_gz simulation.launch.py
 ```
 
+### Headless
+
+To run Gazebo without the GUI (e.g. on a server or in CI), set `headless:=true`. This starts the
+Gazebo server only, with headless rendering so sensors still work without a display.
+
+```bash
+ros2 launch clearpath_gz simulation.launch.py headless:=true
+```
+
 ## Worlds
 
 The `clearpath_gz` package includes several simulation worlds. To select a specific world, use the
