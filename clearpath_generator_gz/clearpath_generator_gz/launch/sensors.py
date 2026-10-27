@@ -34,6 +34,7 @@ from clearpath_config.sensors.types.cameras import (
     AxisCamera,
     BaseCamera,
     IntelRealsense,
+    LuxonisOAKD,
     StereolabsZed
 )
 from clearpath_config.sensors.types.ptu import BasePTU
@@ -62,8 +63,14 @@ class SensorLaunch():
 
     RGBD_CAMERAS = [
         IntelRealsense.SENSOR_MODEL,
+        LuxonisOAKD.SENSOR_MODEL,
         StereolabsZed.SENSOR_MODEL
     ]
+
+    # RGBD cameras whose driver publishes depth somewhere other than depth/
+    DEPTH_NAMESPACES = {
+        LuxonisOAKD.SENSOR_MODEL: 'stereo',
+    }
 
     PTZ_CAMERAS = [
         AxisCamera.SENSOR_MODEL
@@ -141,6 +148,8 @@ class SensorLaunch():
         if self.sensor.SENSOR_MODEL in self.RGBD_CAMERAS:
             depth_ns = '/' + self.namespace + self.name
             depth_topic = depth_ns + '/depth_image'
+            depth_out = depth_ns + '/' + self.DEPTH_NAMESPACES.get(
+                self.sensor.SENSOR_MODEL, 'depth')
 
             depth_bridge_node = LaunchFile.Node(
                 name=self.name + '_gz_depth_bridge',
@@ -152,10 +161,10 @@ class SensorLaunch():
                 }],
                 arguments=[depth_topic],
                 remappings=[
-                    (depth_topic, depth_ns + '/depth/image'),
-                    (depth_topic + '/compressed', depth_ns + '/depth/compressed'),
-                    (depth_topic + '/compressedDepth', depth_ns + '/depth/compressedDepth'),
-                    (depth_topic + '/theora', depth_ns + '/depth/theora'),
+                    (depth_topic, depth_out + '/image'),
+                    (depth_topic + '/compressed', depth_out + '/compressed'),
+                    (depth_topic + '/compressedDepth', depth_out + '/compressedDepth'),
+                    (depth_topic + '/theora', depth_out + '/theora'),
                 ]
             )
             self.extra_gz_nodes.append(depth_bridge_node)

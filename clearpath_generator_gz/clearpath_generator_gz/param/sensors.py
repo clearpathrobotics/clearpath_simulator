@@ -37,6 +37,7 @@ from clearpath_config.sensors.types.cameras import (
     BaseCamera,
     FlirBlackfly,
     IntelRealsense,
+    LuxonisOAKD,
     StereolabsZed,
 )
 from clearpath_config.sensors.types.gps import (
@@ -244,6 +245,8 @@ class SensorParam():
             )
 
     class RGBDCameraParam(CameraParam):
+        DEPTH_NAMESPACE = 'depth'
+
         def __init__(
                 self,
                 sensor: BaseCamera,
@@ -261,11 +264,15 @@ class SensorParam():
             )
 
             self.param_file.add(
-                ros_topic=self.get_ros_topic('depth/camera_info'),
+                ros_topic=self.get_ros_topic(self.DEPTH_NAMESPACE + '/camera_info'),
                 gz_topic=self.get_gz_topic('camera_info'),
                 ros_type=MessageType.ROS.CAMERA_INFO,
                 gz_type=MessageType.GZ.CAMERA_INFO,
             )
+
+    class LuxonisOAKDParam(RGBDCameraParam):
+        # The OAK-D driver publishes depth under stereo/
+        DEPTH_NAMESPACE = 'stereo'
 
     class GPSParam(BaseParam):
         def __init__(
@@ -289,6 +296,7 @@ class SensorParam():
         SickLMS1XX.SENSOR_MODEL: Lidar2dParam,
         FlirBlackfly.SENSOR_MODEL: CameraParam,
         IntelRealsense.SENSOR_MODEL: RGBDCameraParam,
+        LuxonisOAKD.SENSOR_MODEL: LuxonisOAKDParam,
         StereolabsZed.SENSOR_MODEL: RGBDCameraParam,
         BaseIMU.SENSOR_MODEL: ImuParam,
         CHRoboticsUM6.SENSOR_MODEL: ImuParam,
