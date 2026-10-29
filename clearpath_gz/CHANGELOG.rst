@@ -2,6 +2,14 @@
 Changelog for package clearpath_gz
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Added headless option for Gazebo. (`#131 <https://github.com/clearpathrobotics/clearpath_simulator/issues/131>`_)
+  * Added headless option for Gazebo.
+  * Added note in README for how to use headless.
+* Added Github PR templates, precommit and contributing notes. Also, updated CI, updated issue templates and README. (`#119 <https://github.com/clearpathrobotics/clearpath_simulator/issues/119>`_)
+* Contributors: Tony Baltovski
+
 2.9.4 (2026-08-07)
 ------------------
 

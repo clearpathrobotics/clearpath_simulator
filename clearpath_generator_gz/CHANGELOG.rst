@@ -2,6 +2,13 @@
 Changelog for package clearpath_generator_gz
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* [clearpath_generator_gz] Added OAK-D depth and point cloud bridges. (`#133 <https://github.com/clearpathrobotics/clearpath_simulator/issues/133>`_)
+* fix: added generate gz bridge config for Phidgets Spatial IMU. (`#132 <https://github.com/clearpathrobotics/clearpath_simulator/issues/132>`_)
+* Added Github PR templates, precommit and contributing notes. Also, updated CI, updated issue templates and README. (`#119 <https://github.com/clearpathrobotics/clearpath_simulator/issues/119>`_)
+* Contributors: Tony Baltovski
+
 2.9.4 (2026-08-07)
 ------------------
 * Fixed the name of the imu_filter node to match what is being launched. (`#117 <https://github.com/clearpathrobotics/clearpath_simulator/issues/117>`_)
