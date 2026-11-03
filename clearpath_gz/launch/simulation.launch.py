@@ -27,6 +27,18 @@ ARGUMENTS = [
     DeclareLaunchArgument('rviz', default_value='false',
                           choices=['true', 'false'], description='Start rviz.'),
     DeclareLaunchArgument('world', default_value='warehouse',
+<<<<<<< HEAD
+=======
+                          choices=[
+                              'construction',
+                              'empty',
+                              'office',
+                              'orchard',
+                              'pipeline',
+                              'solar_farm',
+                              'warehouse',
+                          ],
+>>>>>>> a26140b ([clearpath_gz] Added empty world. (#137))
                           description='Gazebo World'),
     DeclareLaunchArgument('setup_path',
                           default_value=[EnvironmentVariable('HOME'), '/clearpath/'],
