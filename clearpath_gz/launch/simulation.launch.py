@@ -29,6 +29,7 @@ ARGUMENTS = [
     DeclareLaunchArgument('world', default_value='warehouse',
                           choices=[
                               'construction',
+                              'empty',
                               'office',
                               'orchard',
                               'pipeline',
