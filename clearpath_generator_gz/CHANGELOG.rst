@@ -2,6 +2,9 @@
 Changelog for package clearpath_generator_gz
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+
 2.9.5 (2026-10-29)
 ------------------
 * [clearpath_generator_gz] Added OAK-D depth and point cloud bridges. (`#133 <https://github.com/clearpathrobotics/clearpath_simulator/issues/133>`_)
