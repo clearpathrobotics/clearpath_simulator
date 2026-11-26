@@ -34,7 +34,7 @@
 import os
 
 from clearpath_config.common.types.platform import Platform
-from clearpath_generator_common.common import LaunchFile
+from clearpath_generator_common.common import LaunchFile, Package
 from clearpath_generator_common.launch.generator import LaunchGenerator
 from clearpath_generator_common.launch.writer import LaunchWriter
 from clearpath_generator_gz.launch.sensors import SensorLaunch
@@ -224,6 +224,32 @@ class GzLaunchGenerator(LaunchGenerator):
             platform_service_launch_writer.add(component)
 
         platform_service_launch_writer.generate_file()
+
+        # Platform extras
+        if self.clearpath_config.platform.extras.launch:
+            self.generate_platform_extras()
+
+    def generate_platform_extras(self) -> None:
+        for i, arg in enumerate(self.platform_extras_launch_file.args):
+            if arg[0] == 'use_sim_time':
+                self.platform_extras_launch_file.args[i] = ('use_sim_time', 'true')
+
+        platform_extras_service_launch_writer = LaunchWriter(
+            self.platform_extras_service_launch_file)
+        platform_extras_service_launch_writer.add(self.platform_extras_launch_file)
+
+        for launch in self.clearpath_config.platform.extras.launch:
+            args = {'use_sim_time': 'true'}
+            args.update(launch.args)
+            extra_launch = LaunchFile(
+                name=(os.path.basename(launch.path)).split('.')[0],
+                path=os.path.dirname(launch.path),
+                package=Package(launch.package) if launch.package else None,
+                args=[(key, args[key]) for key in args]
+            )
+            platform_extras_service_launch_writer.add(extra_launch)
+
+        platform_extras_service_launch_writer.generate_file()
 
     def generate_manipulators(self) -> None:
         manipulators_service_launch_writer = LaunchWriter(self.manipulators_service_launch_file)
